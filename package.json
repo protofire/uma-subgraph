@@ -1,0 +1,18 @@
+{
+  "name": "uma-sugraph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ juanmardefago/uma",
+    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ protofire/instadapp-defi-smart-accounts",
+    "create-local": "graph create --node http://localhost:8020/ protofire/instadapp-defi-smart-accounts",
+    "remove-local": "graph remove --node http://localhost:8020/ protofire/instadapp-defi-smart-accounts",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 protofire/instadapp-defi-smart-accounts"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.18.0",
+    "@graphprotocol/graph-ts": "0.18.0"
+  }
+}

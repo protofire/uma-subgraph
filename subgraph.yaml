@@ -1,0 +1,74 @@
+specVersion: 0.0.2
+description: UMA protocol subgraph
+repository: https://github.com/protofire/instadapp-dsa-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Finder
+    network: mainnet
+    source:
+      address: "0x40f941e48a552bf496b154af6bf55725f18d77c3"
+      abi: Finder
+      startBlock: 9247083
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - InterfaceImplementation
+      abis:
+        - name: Finder
+          file: ./abis/Finder.json
+      eventHandlers:
+        - event: InterfaceImplementationChanged(indexed bytes32,indexed address)
+          handler: handleInterfaceImplementationChanged
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleFinderOwnershipTransferred
+  - kind: ethereum/contract
+    name: VotingToken
+    network: mainnet
+    source:
+      address: "0x04fa0d235c4abf4bcf4787af4cf447de572ef828"
+      abi: VotingToken
+      startBlock: 9247089
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - User
+      abis:
+        - name: VotingToken
+          file: ./abis/VotingToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferVotingToken
+  - kind: ethereum/contract
+    name: IdentifierWhitelist
+    network: mainnet
+    source:
+      address: "0xcf649d9da4d1362c4daea67573430bd6f945e570"
+      abi: IdentifierWhitelist
+      startBlock: 9937679
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - User
+      abis:
+        - name: IdentifierWhitelist
+          file: ./abis/IdentifierWhitelist.json
+      eventHandlers:
+        - event: SupportedIdentifierAdded(indexed bytes32)
+          handler: handleSupportedIdentifierAdded
+        - event: SupportedIdentifierRemoved(indexed bytes32)
+          handler: handleSupportedIdentifierRemoved
+
+  # - OwnershipTransferred(indexed address,indexed address)
+  # - SupportedIdentifierAdded(indexed bytes32)
+  # - SupportedIdentifierRemoved(indexed bytes32)

@@ -1,0 +1,20 @@
+type User @entity {
+  id: ID!
+
+  votingTokenBalance: BigDecimal!
+
+  votingTokenBalanceRaw: BigInt!
+}
+
+type InterfaceImplementation @entity {
+  "Name of the Interface implemented on this contract"
+  id: ID!
+
+  address: Bytes!
+}
+
+type PriceIdentifier @entity {
+  id: ID!
+
+  isSupported: Boolean!
+}
