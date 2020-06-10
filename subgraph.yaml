@@ -102,3 +102,29 @@ dataSources:
           handler: handleVoteCommitted
         - event: VoteRevealed(indexed address,indexed uint256,indexed bytes32,uint256,int256,uint256)
           handler: handleVoteRevealed
+  - kind: ethereum/contract
+    name: Registry
+    network: mainnet
+    source:
+      address: "0x3e532e6222afe9bcf02dcb87216802c75d5113ae"
+      abi: Registry
+      startBlock: 9937650
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - FinancialContract
+        - Party
+        - User
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: NewContractRegistered(indexed address,indexed address,address[])
+          handler: handleNewContractRegistered
+        - event: PartyAdded(indexed address,indexed address)
+          handler: handlePartyAdded
+        - event: PartyRemoved(indexed address,indexed address)
+          handler: handlePartyRemoved

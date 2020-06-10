@@ -18,3 +18,9 @@ export {
   handleSupportedIdentifierAdded,
   handleSupportedIdentifierRemoved
 } from "./mappings/identifierWhitelist";
+
+export {
+  handlePartyAdded,
+  handlePartyRemoved,
+  handleNewContractRegistered
+} from "./mappings/registry";

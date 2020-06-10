@@ -8,6 +8,8 @@ type User @entity {
   votesCommited: [CommitedVote!]! @derivedFrom(field:"voter")
 
   votesRevealed: [RevealedVote!]! @derivedFrom(field:"voter")
+
+  contracts: [FinancialContract!]! @derivedFrom(field: "creator")
 }
 
 type InterfaceImplementation @entity {
@@ -75,4 +77,24 @@ type RevealedVote @entity {
   price: BigInt!
 
   voter: User!
+}
+
+type FinancialContract @entity {
+  "Blockchain address of the contract"
+  id: ID!
+
+  creator: User!
+
+  address: Bytes!
+
+  parties: [Party!]! @derivedFrom(field: "contract")
+}
+
+type Party @entity {
+  "Address"
+  id: ID!
+
+  contract: FinancialContract!
+
+  isRemoved: Boolean!
 }

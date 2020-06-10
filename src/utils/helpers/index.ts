@@ -9,3 +9,8 @@ export {
   getOrCreatePriceRequest,
   getOrCreateRevealedVote
 } from "./voting";
+
+export {
+  getOrCreateParty,
+  getOrCreateFinancialContract
+} from "./registry";
