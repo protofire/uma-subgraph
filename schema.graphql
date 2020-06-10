@@ -4,6 +4,10 @@ type User @entity {
   votingTokenBalance: BigDecimal!
 
   votingTokenBalanceRaw: BigInt!
+
+  votesCommited: [CommitedVote!]! @derivedFrom(field:"voter")
+
+  votesRevealed: [RevealedVote!]! @derivedFrom(field:"voter")
 }
 
 type InterfaceImplementation @entity {
@@ -17,4 +21,58 @@ type PriceIdentifier @entity {
   id: ID!
 
   isSupported: Boolean!
+
+  priceRequests: [PriceRequest!]! @derivedFrom(field:"identifier")
+}
+
+type PriceRequest @entity {
+  "ID is the PriceIdentifier ID + the timestamp"
+  id: ID!
+
+  isResolved: Boolean!
+
+  price: BigInt
+
+  latestRoundId: BigInt!
+
+  time: BigInt!
+
+  identifier: PriceIdentifier!
+
+  commitedVotes: [CommitedVote!]! @derivedFrom(field:"request")
+
+  revealedVotes: [RevealedVote!]! @derivedFrom(field:"request")
+}
+
+type CommitedVote @entity {
+  "Commited votes won't show the price until a reveal happens and a RevealedVote is created"
+  id: ID!
+
+  identifier: PriceIdentifier!
+
+  request: PriceRequest!
+
+  time: BigInt!
+
+  roundId: BigInt!
+
+  encryptedVoteData: Bytes
+
+  voter: User!
+}
+
+type RevealedVote @entity {
+  id: ID!
+
+  identifier: PriceIdentifier!
+
+  request: PriceRequest!
+
+  time: BigInt!
+
+  roundId: BigInt!
+
+  price: BigInt!
+
+  voter: User!
 }
