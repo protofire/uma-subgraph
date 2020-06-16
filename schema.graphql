@@ -9,7 +9,7 @@ type User @entity {
 
   votesRevealed: [RevealedVote!]! @derivedFrom(field:"voter")
 
-  contracts: [FinancialContract!]! @derivedFrom(field: "creator")
+  deployedContracts: [FinancialContract!]! @derivedFrom(field: "deployer")
 }
 
 type InterfaceImplementation @entity {
@@ -83,11 +83,22 @@ type FinancialContract @entity {
   "Blockchain address of the contract"
   id: ID!
 
-  creator: User!
+  creator: ContractCreator
+
+  deployer: User
 
   address: Bytes!
 
   parties: [Party!]! @derivedFrom(field: "contract")
+}
+
+type ContractCreator @entity {
+  "This entity represent a single contract creator (EMP Creator). The id is the blockchain address of the EMPCreator"
+  id: ID!
+
+  isRemoved: Boolean!
+
+  manager: Bytes!
 }
 
 type Party @entity {

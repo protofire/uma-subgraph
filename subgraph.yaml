@@ -146,11 +146,14 @@ dataSources:
       file: ./src/index.ts
       entities:
         - FinancialContract
+        - ContractCreator
         - Party
         - User
       abis:
         - name: Registry
           file: ./abis/Registry.json
+        - name: ExpiringMultiPartyCreator
+          file: ./abis/ExpiringMultiPartyCreator.json
       eventHandlers:
         - event: NewContractRegistered(indexed address,indexed address,address[])
           handler: handleNewContractRegistered
@@ -162,3 +165,23 @@ dataSources:
           handler: handleAddedSharedMember
         - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)
           handler: handleRemovedSharedMember
+templates:
+  - name: ExpiringMultiPartyCreator
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ExpiringMultiPartyCreator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - ContractCreator
+        - FinancialContract
+      abis:
+        - name: ExpiringMultiPartyCreator
+          file: ./abis/ExpiringMultiPartyCreator.json
+      eventHandlers:
+        - event: CreatedExpiringMultiParty(indexed address,indexed address)
+          handler: handleCreatedExpiringMultiParty

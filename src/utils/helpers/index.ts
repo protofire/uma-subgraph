@@ -14,5 +14,6 @@ export {
 
 export {
   getOrCreateParty,
-  getOrCreateFinancialContract
+  getOrCreateFinancialContract,
+  getOrCreateContractCreator
 } from "./registry";

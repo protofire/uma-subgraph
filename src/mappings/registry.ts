@@ -5,12 +5,15 @@ import {
   AddedSharedMember,
   RemovedSharedMember
 } from "../../generated/Registry/Registry";
-import { log } from '@graphprotocol/graph-ts'
+import { CreatedExpiringMultiParty } from "../../generated/templates/ExpiringMultiPartyCreator/ExpiringMultiPartyCreator";
+import { log } from "@graphprotocol/graph-ts";
 import {
   getOrCreateFinancialContract,
   getOrCreateParty,
-  getOrCreateUser
+  getOrCreateUser,
+  getOrCreateContractCreator
 } from "../utils/helpers";
+import { BIGINT_ZERO } from "../utils/constants";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
 //   handler: handleNewContractRegistered
@@ -21,7 +24,7 @@ export function handleNewContractRegistered(
   let contract = getOrCreateFinancialContract(
     event.params.contractAddress.toHexString()
   );
-  let creator = getOrCreateUser(event.params.creator.toHexString());
+  let creator = getOrCreateContractCreator(event.params.creator.toHexString());
 
   contract.address = event.params.contractAddress;
   contract.creator = creator.id;
@@ -59,12 +62,47 @@ export function handlePartyRemoved(event: PartyRemoved): void {
 //   handler: handleAddedSharedMember
 
 export function handleAddedSharedMember(event: AddedSharedMember): void {
-  // ToDo
+  if (event.params.roleId == BIGINT_ZERO) {
+    let creator = getOrCreateContractCreator(
+      event.params.newMember.toHexString()
+    );
+
+    creator.manager = event.params.manager;
+    creator.isRemoved = false;
+
+    creator.save();
+  }
 }
 
 // - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)
 //   handler: handleRemovedSharedMember
 
 export function handleRemovedSharedMember(event: RemovedSharedMember): void {
-  // ToDo
+  if (event.params.roleId == BIGINT_ZERO) {
+    let creator = getOrCreateContractCreator(
+      event.params.oldMember.toHexString()
+    );
+
+    creator.manager = event.params.manager;
+    creator.isRemoved = true;
+
+    creator.save();
+  }
+}
+
+// - event: CreatedExpiringMultiParty(indexed address,indexed address)
+//   handler: handleCreatedExpiringMultiParty
+
+export function handleCreatedExpiringMultiParty(
+  event: CreatedExpiringMultiParty
+): void {
+  let contract = getOrCreateFinancialContract(
+    event.params.expiringMultiPartyAddress.toHexString()
+  );
+  let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
+
+  contract.deployer = deployer.id;
+
+  contract.save();
+  deployer.save();
 }
