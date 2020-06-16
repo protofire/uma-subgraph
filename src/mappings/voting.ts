@@ -4,14 +4,17 @@ import {
   PriceResolved,
   VoteCommitted,
   VoteRevealed,
-  RewardsRetrieved
+  RewardsRetrieved,
+  SetGatPercentageCall,
+  SetInflationRateCall
 } from "../../generated/Voting/Voting";
 
 import {
   getOrCreateUser,
   getOrCreateCommitedVote,
   getOrCreatePriceRequest,
-  getOrCreateRevealedVote
+  getOrCreateRevealedVote,
+  getOrCreateStore
 } from "../utils/helpers";
 
 // - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
@@ -155,4 +158,20 @@ export function handleVoteRevealed(event: VoteRevealed): void {
 
   vote.save();
   voter.save();
+}
+
+export function handleSetGatPercentage(call: SetGatPercentageCall): void {
+  let store = getOrCreateStore();
+
+  store.gatPercentage = call.inputs.newGatPercentage.rawValue;
+
+  store.save();
+}
+
+export function handleSetInflationRate(call: SetInflationRateCall): void {
+  let store = getOrCreateStore();
+
+  store.inflationPercentage = call.inputs.newInflationRate.rawValue;
+
+  store.save();
 }

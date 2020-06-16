@@ -11,7 +11,9 @@ export {
   handleVoteCommitted,
   handlePriceRequestAdded,
   handlePriceResolved,
-  handleRewardsRetrieved
+  handleRewardsRetrieved,
+  handleSetGatPercentage,
+  handleSetInflationRate
 } from "./mappings/voting";
 
 export {
@@ -22,5 +24,13 @@ export {
 export {
   handlePartyAdded,
   handlePartyRemoved,
-  handleNewContractRegistered
+  handleNewContractRegistered,
+  handleAddedSharedMember,
+  handleRemovedSharedMember
 } from "./mappings/registry";
+
+export {
+  handleNewWeeklyDelayFeePerSecondPerPfc,
+  handleNewFinalFee,
+  handleNewFixedOracleFeePerSecondPerPfc
+} from "./mappings/store";

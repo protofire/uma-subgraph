@@ -1,7 +1,9 @@
 import {
   NewContractRegistered,
   PartyAdded,
-  PartyRemoved
+  PartyRemoved,
+  AddedSharedMember,
+  RemovedSharedMember
 } from "../../generated/Registry/Registry";
 import { log } from '@graphprotocol/graph-ts'
 import {
@@ -51,4 +53,18 @@ export function handlePartyRemoved(event: PartyRemoved): void {
 
   party.isRemoved = true;
   party.save();
+}
+
+// - event: AddedSharedMember(indexed uint256,indexed address,indexed address)
+//   handler: handleAddedSharedMember
+
+export function handleAddedSharedMember(event: AddedSharedMember): void {
+  // ToDo
+}
+
+// - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)
+//   handler: handleRemovedSharedMember
+
+export function handleRemovedSharedMember(event: RemovedSharedMember): void {
+  // ToDo
 }

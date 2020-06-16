@@ -98,3 +98,18 @@ type Party @entity {
 
   isRemoved: Boolean!
 }
+
+type Store @entity {
+  "Entity that stores the global settings (fees, rates, and more)"
+  id: ID!
+
+  gatPercentage: BigInt!
+
+  inflationPercentage: BigInt!
+
+  regularFee: BigInt!
+
+  finalFee: BigInt!
+
+  weeklyDelayFee: BigInt!
+}
