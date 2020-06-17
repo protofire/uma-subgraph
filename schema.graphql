@@ -5,9 +5,9 @@ type User @entity {
 
   votingTokenBalanceRaw: BigInt!
 
-  votesCommited: [CommitedVote!]! @derivedFrom(field:"voter")
+  votesCommited: [CommitedVote!]! @derivedFrom(field: "voter")
 
-  votesRevealed: [RevealedVote!]! @derivedFrom(field:"voter")
+  votesRevealed: [RevealedVote!]! @derivedFrom(field: "voter")
 
   deployedContracts: [FinancialContract!]! @derivedFrom(field: "deployer")
 }
@@ -24,7 +24,7 @@ type PriceIdentifier @entity {
 
   isSupported: Boolean!
 
-  priceRequests: [PriceRequest!]! @derivedFrom(field:"identifier")
+  priceRequests: [PriceRequest!]! @derivedFrom(field: "identifier")
 }
 
 type PriceRequest @entity {
@@ -41,9 +41,9 @@ type PriceRequest @entity {
 
   identifier: PriceIdentifier!
 
-  commitedVotes: [CommitedVote!]! @derivedFrom(field:"request")
+  commitedVotes: [CommitedVote!]! @derivedFrom(field: "request")
 
-  revealedVotes: [RevealedVote!]! @derivedFrom(field:"request")
+  revealedVotes: [RevealedVote!]! @derivedFrom(field: "request")
 }
 
 type CommitedVote @entity {
@@ -123,4 +123,64 @@ type Store @entity {
   finalFee: BigInt!
 
   weeklyDelayFee: BigInt!
+
+  totalFeesPaid: BigInt!
+
+  regularFeesPaid: BigInt!
+
+  finalFeesPaid: BigInt!
+
+  events: [StoreEvent!]! @derivedFrom(field: "store")
+}
+
+interface StoreEvent {
+  id: ID!
+
+  store: Store!
+
+  contract: FinancialContract!
+
+  totalPaid: BigInt!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type FinalFeePaidEvent implements StoreEvent @entity {
+  id: ID!
+
+  store: Store!
+
+  contract: FinancialContract!
+
+  totalPaid: BigInt!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type RegularFeePaidEvent implements StoreEvent @entity {
+  id: ID!
+
+  store: Store!
+
+  contract: FinancialContract!
+
+  regularFee: BigInt!
+
+  lateFee: BigInt!
+
+  totalPaid: BigInt!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
 }

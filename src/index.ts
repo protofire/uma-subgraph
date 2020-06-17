@@ -35,3 +35,8 @@ export {
   handleNewFinalFee,
   handleNewFixedOracleFeePerSecondPerPfc
 } from "./mappings/store";
+
+export {
+  handleFinalFeesPaid,
+  handleRegularFeesPaid
+} from "./mappings/expiringMultiParty";

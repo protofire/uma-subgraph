@@ -4,7 +4,7 @@ import {
   ContractCreator
 } from "../../../generated/schema";
 import { Address } from "@graphprotocol/graph-ts";
-import { ExpiringMultiPartyCreator } from "../../../generated/templates";
+import { ExpiringMultiParty, ExpiringMultiPartyCreator } from "../../../generated/templates";
 
 export function getOrCreateFinancialContract(
   id: String,
@@ -14,6 +14,8 @@ export function getOrCreateFinancialContract(
 
   if (contract == null && createIfNotFound) {
     contract = new FinancialContract(id);
+
+    ExpiringMultiParty.create(Address.fromString(id));
   }
 
   return contract as FinancialContract;
@@ -40,6 +42,7 @@ export function getOrCreateContractCreator(
 
   if (contractCreator == null && createIfNotFound) {
     contractCreator = new ContractCreator(id);
+    contractCreator.isRemoved = false;
 
     ExpiringMultiPartyCreator.create(Address.fromString(id));
   }

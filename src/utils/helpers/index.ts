@@ -17,3 +17,8 @@ export {
   getOrCreateFinancialContract,
   getOrCreateContractCreator
 } from "./registry";
+
+export {
+  getOrCreateFinalFeePaidEvent,
+  getOrCreateRegularFeePaidEvent
+} from "./expiringMultiParty";
