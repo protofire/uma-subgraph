@@ -74,6 +74,9 @@ export function handlePriceResolved(event: PriceResolved): void {
 
   request.latestRoundId = event.params.roundId;
   request.price = event.params.price;
+  request.resolutionTransaction = event.transaction.hash;
+  request.resolutionTimestamp = event.block.timestamp;
+  request.resolutionBlock = event.block.number
 
   request.save();
 }

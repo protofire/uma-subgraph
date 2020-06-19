@@ -13,7 +13,7 @@ import {
   getOrCreateUser,
   getOrCreateContractCreator
 } from "../utils/helpers";
-import { BIGINT_ZERO } from "../utils/constants";
+import { BIGINT_ONE } from "../utils/constants";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
 //   handler: handleNewContractRegistered
@@ -62,7 +62,7 @@ export function handlePartyRemoved(event: PartyRemoved): void {
 //   handler: handleAddedSharedMember
 
 export function handleAddedSharedMember(event: AddedSharedMember): void {
-  if (event.params.roleId == BIGINT_ZERO) {
+  if (event.params.roleId == BIGINT_ONE) {
     let creator = getOrCreateContractCreator(
       event.params.newMember.toHexString()
     );
@@ -78,7 +78,7 @@ export function handleAddedSharedMember(event: AddedSharedMember): void {
 //   handler: handleRemovedSharedMember
 
 export function handleRemovedSharedMember(event: RemovedSharedMember): void {
-  if (event.params.roleId == BIGINT_ZERO) {
+  if (event.params.roleId == BIGINT_ONE) {
     let creator = getOrCreateContractCreator(
       event.params.oldMember.toHexString()
     );
@@ -102,6 +102,7 @@ export function handleCreatedExpiringMultiParty(
   let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
 
   contract.deployer = deployer.id;
+  contract.address = event.params.expiringMultiPartyAddress;
 
   contract.save();
   deployer.save();

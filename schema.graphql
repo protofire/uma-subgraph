@@ -41,6 +41,12 @@ type PriceRequest @entity {
 
   identifier: PriceIdentifier!
 
+  resolutionTransaction: Bytes
+
+  resolutionTimestamp: BigInt
+
+  resolutionBlock: BigInt
+
   commitedVotes: [CommitedVote!]! @derivedFrom(field: "request")
 
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "request")
@@ -98,7 +104,7 @@ type ContractCreator @entity {
 
   isRemoved: Boolean!
 
-  manager: Bytes!
+  manager: Bytes
 }
 
 type Party @entity {

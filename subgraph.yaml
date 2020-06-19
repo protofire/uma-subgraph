@@ -72,7 +72,7 @@ dataSources:
     name: Store
     network: mainnet
     source:
-      address: "0xcf649d9da4d1362c4daea67573430bd6f945e570"
+      address: "0x54f44ea3d2e7aa0ac089c4d8f7c93c27844057bf"
       abi: Store
       startBlock: 9937562
     mapping:
