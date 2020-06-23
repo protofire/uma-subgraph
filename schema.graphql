@@ -35,7 +35,7 @@ type PriceRequest @entity {
 
   price: BigInt
 
-  latestRoundId: BigInt!
+  latestRound: PriceRequestRound!
 
   time: BigInt!
 
@@ -47,9 +47,38 @@ type PriceRequest @entity {
 
   resolutionBlock: BigInt
 
+  rounds: [PriceRequestRound!]! @derivedFrom(field: "request")
+
   commitedVotes: [CommitedVote!]! @derivedFrom(field: "request")
 
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "request")
+
+  rewardsClaimed: [RewardsClaimed!]! @derivedFrom(field: "request")
+}
+
+type PriceRequestRound @entity {
+  "ID is the PriceIdentifier ID + the timestamp + the roundId"
+  id: ID!
+
+  request: PriceRequest!
+
+  identifier: PriceIdentifier!
+
+  time: BigInt!
+
+  roundId: BigInt!
+
+  snapshotId: BigInt
+
+  totalVotesRevealed: BigInt!
+
+  totalRewardsClaimed: BigInt!
+
+  commitedVotes: [CommitedVote!]! @derivedFrom(field: "round")
+
+  revealedVotes: [RevealedVote!]! @derivedFrom(field: "round")
+
+  rewardsClaimed: [RewardsClaimed!]! @derivedFrom(field: "round")
 }
 
 type CommitedVote @entity {
@@ -62,7 +91,7 @@ type CommitedVote @entity {
 
   time: BigInt!
 
-  roundId: BigInt!
+  round: PriceRequestRound!
 
   encryptedVoteData: Bytes
 
@@ -78,11 +107,29 @@ type RevealedVote @entity {
 
   time: BigInt!
 
-  roundId: BigInt!
+  round: PriceRequestRound!
 
   price: BigInt!
 
   voter: User!
+
+  numTokens: BigInt!
+}
+
+type RewardsClaimed @entity {
+  id: ID!
+
+  identifier: PriceIdentifier!
+
+  request: PriceRequest!
+
+  time: BigInt!
+
+  round: PriceRequestRound!
+
+  claimer: User!
+
+  numTokens: BigInt!
 }
 
 type FinancialContract @entity {

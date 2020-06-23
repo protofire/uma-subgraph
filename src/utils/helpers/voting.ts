@@ -1,8 +1,11 @@
 import {
   PriceRequest,
+  PriceRequestRound,
   CommitedVote,
-  RevealedVote
+  RevealedVote,
+  RewardsClaimed
 } from "../../../generated/schema";
+import { BIGINT_ZERO } from "../constants";
 
 export function getOrCreatePriceRequest(
   id: String,
@@ -16,6 +19,22 @@ export function getOrCreatePriceRequest(
   }
 
   return request as PriceRequest;
+}
+
+export function getOrCreatePriceRequestRound(
+  id: String,
+  createIfNotFound: boolean = true
+): PriceRequestRound {
+  let requestRound = PriceRequestRound.load(id);
+
+  if (requestRound == null && createIfNotFound) {
+    requestRound = new PriceRequestRound(id);
+
+    requestRound.totalVotesRevealed = BIGINT_ZERO;
+    requestRound.totalRewardsClaimed = BIGINT_ZERO;
+  }
+
+  return requestRound as PriceRequestRound;
 }
 
 export function getOrCreateCommitedVote(
@@ -42,4 +61,17 @@ export function getOrCreateRevealedVote(
   }
 
   return vote as RevealedVote;
+}
+
+export function getOrCreateRewardsClaimed(
+  id: String,
+  createIfNotFound: boolean = true
+): RewardsClaimed {
+  let rewards = RewardsClaimed.load(id);
+
+  if (rewards == null && createIfNotFound) {
+    rewards = new RewardsClaimed(id);
+  }
+
+  return rewards as RewardsClaimed;
 }

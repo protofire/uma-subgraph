@@ -11,6 +11,9 @@ export function getOrCreateStore(): Store {
     store.weeklyDelayFee = BIGINT_ZERO;
     store.gatPercentage = BIGINT_ZERO;
     store.inflationPercentage = BIGINT_ZERO;
+    store.totalFeesPaid = BIGINT_ZERO;
+    store.regularFeesPaid = BIGINT_ZERO;
+    store.finalFeesPaid = BIGINT_ZERO;
   }
 
   return store as Store;

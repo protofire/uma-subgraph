@@ -9,7 +9,9 @@ export { getOrCreateStore } from "./store";
 export {
   getOrCreateCommitedVote,
   getOrCreatePriceRequest,
-  getOrCreateRevealedVote
+  getOrCreatePriceRequestRound,
+  getOrCreateRevealedVote,
+  getOrCreateRewardsClaimed
 } from "./voting";
 
 export {

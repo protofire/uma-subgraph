@@ -6,7 +6,8 @@ import {
   VoteRevealed,
   RewardsRetrieved,
   SetGatPercentageCall,
-  SetInflationRateCall
+  SetInflationRateCall,
+  Voting
 } from "../../generated/Voting/Voting";
 
 import {
@@ -14,8 +15,12 @@ import {
   getOrCreateCommitedVote,
   getOrCreatePriceRequest,
   getOrCreateRevealedVote,
+  getOrCreateRewardsClaimed,
+  getOrCreatePriceRequestRound,
   getOrCreateStore
 } from "../utils/helpers";
+
+import { log } from "@graphprotocol/graph-ts";
 
 // - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
 //   handler: handleEncryptedVote
@@ -53,11 +58,20 @@ export function handlePriceRequestAdded(event: PriceRequestAdded): void {
     .concat("-")
     .concat(event.params.time.toString());
   let request = getOrCreatePriceRequest(requestId);
+  let requestRound = getOrCreatePriceRequestRound(
+    requestId.concat("-").concat(event.params.roundId.toString())
+  );
 
   request.identifier = event.params.identifier.toString();
-  request.latestRoundId = event.params.roundId;
+  request.latestRound = requestRound.id;
   request.time = event.params.time;
 
+  requestRound.request = request.id;
+  requestRound.identifier = event.params.identifier.toString();
+  requestRound.time = event.params.time;
+  requestRound.roundId = event.params.roundId;
+
+  requestRound.save();
   request.save();
 }
 
@@ -71,13 +85,22 @@ export function handlePriceResolved(event: PriceResolved): void {
     .concat("-")
     .concat(event.params.time.toString());
   let request = getOrCreatePriceRequest(requestId);
+  let requestRound = getOrCreatePriceRequestRound(
+    requestId.concat("-").concat(event.params.roundId.toString())
+  );
 
-  request.latestRoundId = event.params.roundId;
+  request.latestRound = requestRound.id;
   request.price = event.params.price;
   request.resolutionTransaction = event.transaction.hash;
   request.resolutionTimestamp = event.block.timestamp;
-  request.resolutionBlock = event.block.number
+  request.resolutionBlock = event.block.number;
 
+  requestRound.request = request.id;
+  requestRound.identifier = event.params.identifier.toString();
+  requestRound.time = event.params.time;
+  requestRound.roundId = event.params.roundId;
+
+  requestRound.save();
   request.save();
 }
 
@@ -92,7 +115,41 @@ export function handlePriceResolved(event: PriceResolved): void {
 //  );
 
 export function handleRewardsRetrieved(event: RewardsRetrieved): void {
-  // to do
+  let rewardClaimedId = event.params.voter
+    .toHexString()
+    .concat("-")
+    .concat(event.params.identifier.toString())
+    .concat("-")
+    .concat(event.params.time.toString())
+    .concat("-")
+    .concat(event.params.roundId.toString());
+  let rewardClaimed = getOrCreateRewardsClaimed(rewardClaimedId);
+  let claimer = getOrCreateUser(event.params.voter.toHexString());
+  let requestId = event.params.identifier
+    .toString()
+    .concat("-")
+    .concat(event.params.time.toString());
+  let requestRound = getOrCreatePriceRequestRound(
+    requestId.concat("-").concat(event.params.roundId.toString())
+  );
+
+  rewardClaimed.claimer = claimer.id;
+  rewardClaimed.round = requestRound.id;
+  rewardClaimed.request = requestId;
+  rewardClaimed.identifier = event.params.identifier.toString();
+  rewardClaimed.time = event.params.time;
+  rewardClaimed.numTokens = event.params.numTokens;
+
+  requestRound.request = requestId;
+  requestRound.identifier = event.params.identifier.toString();
+  requestRound.time = event.params.time;
+  requestRound.roundId = event.params.roundId;
+  requestRound.totalRewardsClaimed =
+    requestRound.totalRewardsClaimed + rewardClaimed.numTokens;
+
+  requestRound.save();
+  rewardClaimed.save();
+  claimer.save();
 }
 
 // - event: VoteCommitted(indexed address,indexed uint256,indexed bytes32,uint256)
@@ -114,13 +171,22 @@ export function handleVoteCommitted(event: VoteCommitted): void {
     .toString()
     .concat("-")
     .concat(event.params.time.toString());
+  let requestRound = getOrCreatePriceRequestRound(
+    requestId.concat("-").concat(event.params.roundId.toString())
+  );
 
   vote.voter = voter.id;
   vote.request = requestId;
   vote.identifier = event.params.identifier.toString();
   vote.time = event.params.time;
-  vote.roundId = event.params.roundId;
+  vote.round = requestRound.id;
 
+  requestRound.request = requestId;
+  requestRound.identifier = event.params.identifier.toString();
+  requestRound.time = event.params.time;
+  requestRound.roundId = event.params.roundId;
+
+  requestRound.save();
   vote.save();
   voter.save();
 }
@@ -151,19 +217,37 @@ export function handleVoteRevealed(event: VoteRevealed): void {
     .toString()
     .concat("-")
     .concat(event.params.time.toString());
+  let requestRound = getOrCreatePriceRequestRound(
+    requestId.concat("-").concat(event.params.roundId.toString())
+  );
+  let votingContract = Voting.bind(event.address);
+  let roundInfo = votingContract.try_rounds(event.params.roundId);
 
   vote.voter = voter.id;
+  vote.round = requestRound.id;
   vote.request = requestId;
   vote.identifier = event.params.identifier.toString();
   vote.time = event.params.time;
   vote.price = event.params.price;
-  vote.roundId = event.params.roundId;
+  vote.numTokens = event.params.numTokens;
 
+  requestRound.request = requestId;
+  requestRound.identifier = event.params.identifier.toString();
+  requestRound.time = event.params.time;
+  requestRound.roundId = event.params.roundId;
+  requestRound.totalVotesRevealed =
+    requestRound.totalVotesRevealed + vote.numTokens;
+  requestRound.snapshotId = roundInfo.reverted ? null : roundInfo.value.value0;
+
+  requestRound.save();
   vote.save();
   voter.save();
 }
 
 export function handleSetGatPercentage(call: SetGatPercentageCall): void {
+  log.warning("Gat percentage called {}", [
+    call.inputs.newGatPercentage.rawValue.toString()
+  ]);
   let store = getOrCreateStore();
 
   store.gatPercentage = call.inputs.newGatPercentage.rawValue;
@@ -172,6 +256,9 @@ export function handleSetGatPercentage(call: SetGatPercentageCall): void {
 }
 
 export function handleSetInflationRate(call: SetInflationRateCall): void {
+  log.warning("inflation rate called {}", [
+    call.inputs.newInflationRate.rawValue.toString()
+  ]);
   let store = getOrCreateStore();
 
   store.inflationPercentage = call.inputs.newInflationRate.rawValue;
