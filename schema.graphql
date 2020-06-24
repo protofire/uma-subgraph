@@ -74,6 +74,14 @@ type PriceRequestRound @entity {
 
   totalRewardsClaimed: BigInt!
 
+  totalSupplyAtSnapshot: BigInt
+
+  "Ratio of the total supply of tokens that were weighted on this vote"
+  tokensWeightedOverTotalSupplyRaw: BigDecimal
+
+  "Percentage of the total supply of tokens that were weighted on this vote"
+  tokensWeightedOverTotalSupply: BigDecimal
+
   commitedVotes: [CommitedVote!]! @derivedFrom(field: "round")
 
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "round")

@@ -1,5 +1,6 @@
 import { User } from "../../../generated/schema";
-import { BIGINT_ZERO, BIGDECIMAL_ZERO } from "../constants";
+import { VotingToken } from "../../../generated/VotingToken/VotingToken";
+import { BIGINT_ZERO, BIGDECIMAL_ZERO, VOTING_TOKEN_ADDRESS } from "../constants";
 
 export function getOrCreateUser(
   id: String,
@@ -14,4 +15,8 @@ export function getOrCreateUser(
   }
 
   return user as User;
+}
+
+export function getTokenContract(): VotingToken {
+  return VotingToken.bind(VOTING_TOKEN_ADDRESS);
 }

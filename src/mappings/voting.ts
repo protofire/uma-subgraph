@@ -9,7 +9,6 @@ import {
   SetInflationRateCall,
   Voting
 } from "../../generated/Voting/Voting";
-
 import {
   getOrCreateUser,
   getOrCreateCommitedVote,
@@ -17,10 +16,11 @@ import {
   getOrCreateRevealedVote,
   getOrCreateRewardsClaimed,
   getOrCreatePriceRequestRound,
-  getOrCreateStore
+  getOrCreateStore,
+  getTokenContract
 } from "../utils/helpers";
 
-import { log } from "@graphprotocol/graph-ts";
+import { log, BigInt } from "@graphprotocol/graph-ts";
 
 // - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
 //   handler: handleEncryptedVote
@@ -238,6 +238,24 @@ export function handleVoteRevealed(event: VoteRevealed): void {
   requestRound.totalVotesRevealed =
     requestRound.totalVotesRevealed + vote.numTokens;
   requestRound.snapshotId = roundInfo.reverted ? null : roundInfo.value.value0;
+  if (
+    requestRound.snapshotId != null &&
+    requestRound.totalSupplyAtSnapshot == null
+  ) {
+    let supply = getTokenContract().try_totalSupplyAt(
+      <BigInt>requestRound.snapshotId
+    );
+    requestRound.totalSupplyAtSnapshot = supply.reverted
+      ? null
+      : (supply.value as BigInt);
+  }
+  requestRound.tokensWeightedOverTotalSupplyRaw =
+    requestRound.totalSupplyAtSnapshot != null
+      ? requestRound.totalVotesRevealed.toBigDecimal() /
+        requestRound.totalSupplyAtSnapshot.toBigDecimal()
+      : null;
+  requestRound.tokensWeightedOverTotalSupply =
+    requestRound.tokensWeightedOverTotalSupplyRaw * BigInt.fromI32(100).toBigDecimal();
 
   requestRound.save();
   vote.save();

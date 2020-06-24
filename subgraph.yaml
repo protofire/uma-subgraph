@@ -114,6 +114,8 @@ dataSources:
       abis:
         - name: Voting
           file: ./abis/Voting.json
+        - name: VotingToken
+          file: ./abis/VotingToken.json
       eventHandlers:
         - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
           handler: handleEncryptedVote
