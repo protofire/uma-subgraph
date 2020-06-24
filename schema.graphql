@@ -150,7 +150,23 @@ type FinancialContract @entity {
 
   address: Bytes!
 
+  collateralToken: CollateralToken
+
+  collateralRequirement: BigInt
+
+  expirationTimestamp: BigInt
+
+  totalTokensCreated: BigInt
+
+  positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
+
   parties: [Party!]! @derivedFrom(field: "contract")
+}
+
+interface PositionManagerEvent {
+  id: ID!
+
+  contract: FinancialContract!
 }
 
 type ContractCreator @entity {
@@ -244,4 +260,18 @@ type RegularFeePaidEvent implements StoreEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+}
+
+type CollateralToken @entity {
+  id: ID!
+
+  address: Bytes!
+
+  decimals: Int!
+
+  name: String!
+
+  symbol: String!
+
+  usedBy: [FinancialContract!]! @derivedFrom(field: "collateralToken")
 }

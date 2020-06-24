@@ -6,12 +6,14 @@ import {
   RemovedSharedMember
 } from "../../generated/Registry/Registry";
 import { CreatedExpiringMultiParty } from "../../generated/templates/ExpiringMultiPartyCreator/ExpiringMultiPartyCreator";
-import { log } from "@graphprotocol/graph-ts";
+import { ExpiringMultiParty } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
+import { log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
   getOrCreateFinancialContract,
   getOrCreateParty,
   getOrCreateUser,
-  getOrCreateContractCreator
+  getOrCreateContractCreator,
+  getOrCreateToken
 } from "../utils/helpers";
 import { BIGINT_ONE } from "../utils/constants";
 
@@ -100,9 +102,21 @@ export function handleCreatedExpiringMultiParty(
     event.params.expiringMultiPartyAddress.toHexString()
   );
   let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
+  let empContract = ExpiringMultiParty.bind(event.params.expiringMultiPartyAddress);
+
+  let currency = empContract.try_collateralCurrency();
+  let requirement = empContract.try_collateralRequirement();
+  let expiration = empContract.try_expirationTimestamp();
+
+  if(!currency.reverted) {
+    let token = getOrCreateToken(currency.value);
+    contract.collateralToken = token.id;
+  }
 
   contract.deployer = deployer.id;
   contract.address = event.params.expiringMultiPartyAddress;
+  contract.collateralRequirement = requirement.reverted ? null : requirement.value;
+  contract.expirationTimestamp = expiration.reverted ? null : expiration.value;
 
   contract.save();
   deployer.save();

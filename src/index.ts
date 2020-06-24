@@ -38,5 +38,10 @@ export {
 
 export {
   handleFinalFeesPaid,
-  handleRegularFeesPaid
+  handleRegularFeesPaid,
+  handlePositionCreated,
+  handleSettleExpiredPosition,
+  handleWithdrawal,
+  handleDeposit,
+  handleRedeem
 } from "./mappings/expiringMultiParty";
