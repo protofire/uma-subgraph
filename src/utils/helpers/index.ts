@@ -23,5 +23,10 @@ export {
 
 export {
   getOrCreateFinalFeePaidEvent,
-  getOrCreateRegularFeePaidEvent
+  getOrCreateRegularFeePaidEvent,
+  getOrCreatePositionCreatedEvent,
+  getOrCreateSettleExpiredPositionEvent,
+  getOrCreateRedeemEvent,
+  getOrCreateDepositEvent,
+  getOrCreateWithdrawalEvent
 } from "./expiringMultiParty";

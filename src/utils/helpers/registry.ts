@@ -2,13 +2,14 @@ import {
   Party,
   FinancialContract,
   ContractCreator,
-  CollateralToken
+  Token
 } from "../../../generated/schema";
 import { Address } from "@graphprotocol/graph-ts";
 import { ExpiringMultiParty, ExpiringMultiPartyCreator } from "../../../generated/templates";
 import { ERC20 } from "../../../generated/templates/ExpiringMultiPartyCreator/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 import { DEFAULT_DECIMALS } from "../decimals";
+import { BIGINT_ZERO } from "../constants";
 
 export function getOrCreateFinancialContract(
   id: String,
@@ -18,6 +19,7 @@ export function getOrCreateFinancialContract(
 
   if (contract == null && createIfNotFound) {
     contract = new FinancialContract(id);
+    contract.totalTokensCreated = BIGINT_ZERO;
 
     ExpiringMultiParty.create(Address.fromString(id));
   }
@@ -57,13 +59,13 @@ export function getOrCreateContractCreator(
 export function getOrCreateToken(
   tokenAddress: Address,
   persist: boolean = true
-): CollateralToken {
+): Token {
   let addressString = tokenAddress.toHexString();
 
-  let token = CollateralToken.load(addressString);
+  let token = Token.load(addressString);
 
   if (token == null) {
-    token = new CollateralToken(addressString);
+    token = new Token(addressString);
     token.address = tokenAddress;
 
     let erc20Token = ERC20.bind(tokenAddress);
@@ -83,5 +85,5 @@ export function getOrCreateToken(
     }
   }
 
-  return token as CollateralToken;
+  return token as Token;
 }

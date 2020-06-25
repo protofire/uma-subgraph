@@ -150,13 +150,13 @@ type FinancialContract @entity {
 
   address: Bytes!
 
-  collateralToken: CollateralToken
+  collateralToken: Token
 
   collateralRequirement: BigInt
 
   expirationTimestamp: BigInt
 
-  totalTokensCreated: BigInt
+  totalTokensCreated: BigInt!
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
@@ -167,6 +167,72 @@ interface PositionManagerEvent {
   id: ID!
 
   contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type PositionCreatedEvent implements PositionManagerEvent @entity {
+  id: ID!
+
+  contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type SettleExpiredPositionEvent implements PositionManagerEvent @entity {
+  id: ID!
+
+  contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type RedeemEvent implements PositionManagerEvent @entity {
+  id: ID!
+
+  contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type DepositEvent implements PositionManagerEvent @entity {
+  id: ID!
+
+  contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+}
+
+type WithdrawalEvent implements PositionManagerEvent @entity {
+  id: ID!
+
+  contract: FinancialContract!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
 }
 
 type ContractCreator @entity {
@@ -262,7 +328,7 @@ type RegularFeePaidEvent implements StoreEvent @entity {
   timestamp: BigInt!
 }
 
-type CollateralToken @entity {
+type Token @entity {
   id: ID!
 
   address: Bytes!
