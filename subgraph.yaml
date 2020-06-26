@@ -224,6 +224,8 @@ templates:
           handler: handleWithdrawal
         - event: NewSponsor(indexed address)
           handler: handleNewSponsor
+        - event: EndedSponsorPosition(indexed address)
+          handler: handleEndedSponsorPosition
 
   # - ContractExpired(indexed address)
   # + Deposit(indexed address,indexed uint256)

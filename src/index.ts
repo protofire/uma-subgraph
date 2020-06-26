@@ -44,5 +44,6 @@ export {
   handleWithdrawal,
   handleDeposit,
   handleRedeem,
-  handleNewSponsor
+  handleNewSponsor,
+  handleEndedSponsorPosition
 } from "./mappings/expiringMultiParty";

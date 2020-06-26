@@ -6,9 +6,11 @@ import {
   RedeemEvent,
   DepositEvent,
   WithdrawalEvent,
-  Sponsor
+  Sponsor,
+  SponsorPosition
 } from "../../../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO } from "../constants";
 
 export function getOrCreateRegularFeePaidEvent(
   ethereumEvent: ethereum.Event
@@ -132,4 +134,21 @@ export function getOrCreateSponsor(
   }
 
   return sponsor as Sponsor;
+}
+
+export function getOrCreateSponsorPosition(
+  id: String,
+  createIfNotFound: boolean = true
+): SponsorPosition {
+  let position = SponsorPosition.load(id);
+
+  if (position == null && createIfNotFound) {
+    position = new SponsorPosition(id);
+
+    position.rawCollateral = BIGINT_ZERO;
+    position.tokensOutstanding = BIGINT_ZERO;
+    position.isEnded = false;
+  }
+
+  return position as SponsorPosition;
 }

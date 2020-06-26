@@ -160,6 +160,8 @@ type FinancialContract @entity {
 
   totalTokensOutstanding: BigInt
 
+  rawTotalPositionCollateral: BigInt
+
   totalSyntheticTokensCreated: BigInt!
 
   totalSyntheticTokensBurned: BigInt!
@@ -168,13 +170,28 @@ type FinancialContract @entity {
 
   parties: [Party!]! @derivedFrom(field: "contract")
 
-  sponsors: [Sponsor!]! @derivedFrom(field: "contract")
+  sponsorPositions: [SponsorPosition!]! @derivedFrom(field: "contract")
 }
 
 type Sponsor @entity {
   id: ID!
 
+  positions: [SponsorPosition!]! @derivedFrom(field: "sponsor")
+}
+
+type SponsorPosition @entity {
+  "Sponsor ID + FinancialContract ID"
+  id: ID!
+
   contract: FinancialContract!
+
+  sponsor: Sponsor!
+
+  rawCollateral: BigInt!
+
+  tokensOutstanding: BigInt!
+
+  isEnded: Boolean!
 }
 
 interface PositionManagerEvent {
