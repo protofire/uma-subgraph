@@ -19,7 +19,8 @@ export function getOrCreateFinancialContract(
 
   if (contract == null && createIfNotFound) {
     contract = new FinancialContract(id);
-    contract.totalTokensCreated = BIGINT_ZERO;
+    contract.totalSyntheticTokensCreated = BIGINT_ZERO;
+    contract.totalSyntheticTokensBurned = BIGINT_ZERO;
 
     ExpiringMultiParty.create(Address.fromString(id));
   }

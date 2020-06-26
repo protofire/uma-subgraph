@@ -152,15 +152,29 @@ type FinancialContract @entity {
 
   collateralToken: Token
 
+  syntheticToken: Token
+
   collateralRequirement: BigInt
 
   expirationTimestamp: BigInt
 
-  totalTokensCreated: BigInt!
+  totalTokensOutstanding: BigInt
+
+  totalSyntheticTokensCreated: BigInt!
+
+  totalSyntheticTokensBurned: BigInt!
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
   parties: [Party!]! @derivedFrom(field: "contract")
+
+  sponsors: [Sponsor!]! @derivedFrom(field: "contract")
+}
+
+type Sponsor @entity {
+  id: ID!
+
+  contract: FinancialContract!
 }
 
 interface PositionManagerEvent {
@@ -185,6 +199,12 @@ type PositionCreatedEvent implements PositionManagerEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+
+  sponsor: Sponsor!
+
+  collateralAmount: BigInt!
+
+  tokenAmount: BigInt!
 }
 
 type SettleExpiredPositionEvent implements PositionManagerEvent @entity {
@@ -197,6 +217,12 @@ type SettleExpiredPositionEvent implements PositionManagerEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+
+  caller: Bytes!
+
+  collateralReturned: BigInt!
+
+  tokensBurned: BigInt!
 }
 
 type RedeemEvent implements PositionManagerEvent @entity {
@@ -209,6 +235,12 @@ type RedeemEvent implements PositionManagerEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+
+  sponsor: Sponsor!
+
+  collateralAmount: BigInt!
+
+  tokenAmount: BigInt!
 }
 
 type DepositEvent implements PositionManagerEvent @entity {
@@ -221,6 +253,10 @@ type DepositEvent implements PositionManagerEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+
+  sponsor: Sponsor!
+
+  collateralAmount: BigInt!
 }
 
 type WithdrawalEvent implements PositionManagerEvent @entity {
@@ -233,6 +269,10 @@ type WithdrawalEvent implements PositionManagerEvent @entity {
   block: BigInt!
 
   timestamp: BigInt!
+
+  sponsor: Sponsor!
+
+  collateralAmount: BigInt!
 }
 
 type ContractCreator @entity {
@@ -338,6 +378,4 @@ type Token @entity {
   name: String!
 
   symbol: String!
-
-  usedBy: [FinancialContract!]! @derivedFrom(field: "collateralToken")
 }

@@ -5,7 +5,8 @@ import {
   SettleExpiredPositionEvent,
   RedeemEvent,
   DepositEvent,
-  WithdrawalEvent
+  WithdrawalEvent,
+  Sponsor
 } from "../../../generated/schema";
 import { ethereum } from "@graphprotocol/graph-ts";
 
@@ -118,4 +119,17 @@ export function getOrCreateWithdrawalEvent(
   event.timestamp = ethereumEvent.block.timestamp;
 
   return event as WithdrawalEvent;
+}
+
+export function getOrCreateSponsor(
+  id: String,
+  createIfNotFound: boolean = true
+): Sponsor {
+  let sponsor = Sponsor.load(id);
+
+  if (sponsor == null && createIfNotFound) {
+    sponsor = new Sponsor(id);
+  }
+
+  return sponsor as Sponsor;
 }

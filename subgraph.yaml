@@ -222,6 +222,8 @@ templates:
           handler: handleDeposit
         - event: Withdrawal(indexed address,indexed uint256)
           handler: handleWithdrawal
+        - event: NewSponsor(indexed address)
+          handler: handleNewSponsor
 
   # - ContractExpired(indexed address)
   # + Deposit(indexed address,indexed uint256)

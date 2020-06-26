@@ -104,19 +104,27 @@ export function handleCreatedExpiringMultiParty(
   let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
   let empContract = ExpiringMultiParty.bind(event.params.expiringMultiPartyAddress);
 
-  let currency = empContract.try_collateralCurrency();
+  let collateral = empContract.try_collateralCurrency();
+  let synthetic = empContract.try_tokenCurrency();
   let requirement = empContract.try_collateralRequirement();
   let expiration = empContract.try_expirationTimestamp();
+  let totalOutstanding = empContract.try_totalTokensOutstanding();
 
-  if(!currency.reverted) {
-    let token = getOrCreateToken(currency.value);
-    contract.collateralToken = token.id;
+  if(!collateral.reverted) {
+    let collateralToken = getOrCreateToken(collateral.value);
+    contract.collateralToken = collateralToken.id;
+  }
+
+  if(!synthetic.reverted) {
+    let syntheticToken = getOrCreateToken(synthetic.value);
+    contract.syntheticToken = syntheticToken.id;
   }
 
   contract.deployer = deployer.id;
   contract.address = event.params.expiringMultiPartyAddress;
   contract.collateralRequirement = requirement.reverted ? null : requirement.value;
   contract.expirationTimestamp = expiration.reverted ? null : expiration.value;
+  contract.totalTokensOutstanding = totalOutstanding.reverted ? null : totalOutstanding.value;
 
   contract.save();
   deployer.save();

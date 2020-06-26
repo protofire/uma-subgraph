@@ -6,6 +6,8 @@ import {
   Redeem,
   PositionCreated,
   SettleExpiredPosition,
+  NewSponsor,
+  ExpiringMultiParty
 } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
 import {
   getOrCreateStore,
@@ -16,7 +18,8 @@ import {
   getOrCreateSettleExpiredPositionEvent,
   getOrCreateRedeemEvent,
   getOrCreateDepositEvent,
-  getOrCreateWithdrawalEvent
+  getOrCreateWithdrawalEvent,
+  getOrCreateSponsor
 } from "../utils/helpers";
 
 // - event: FinalFeesPaid(indexed uint256)
@@ -71,9 +74,19 @@ export function handleRegularFeesPaid(event: RegularFeesPaid): void {
 export function handlePositionCreated(event: PositionCreated): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreatePositionCreatedEvent(event);
-  emp.totalTokensCreated = emp.totalTokensCreated + event.params.tokenAmount;
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let outstanding = empContract.try_totalTokensOutstanding();
+
+  emp.totalSyntheticTokensCreated =
+    emp.totalSyntheticTokensCreated + event.params.tokenAmount;
+  emp.totalTokensOutstanding = outstanding.reverted
+    ? emp.totalTokensOutstanding
+    : outstanding.value;
 
   positionEvent.contract = emp.id;
+  positionEvent.sponsor = event.params.sponsor.toHexString();
+  positionEvent.collateralAmount = event.params.collateralAmount;
+  positionEvent.tokenAmount = event.params.tokenAmount;
 
   positionEvent.save();
   emp.save();
@@ -81,50 +94,108 @@ export function handlePositionCreated(event: PositionCreated): void {
 
 // - event: SettleExpiredPosition(indexed address,indexed uint256,indexed uint256)
 //   handler: handleSettleExpiredPosition
+// event SettleExpiredPosition(
+//       address indexed caller,
+//       uint256 indexed collateralReturned,
+//       uint256 indexed tokensBurned
+//   );
 
 export function handleSettleExpiredPosition(
   event: SettleExpiredPosition
 ): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateSettleExpiredPositionEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let outstanding = empContract.try_totalTokensOutstanding();
+
+  emp.totalTokensOutstanding = outstanding.reverted
+    ? emp.totalTokensOutstanding
+    : outstanding.value;
 
   positionEvent.contract = emp.id;
+  positionEvent.caller = event.params.caller;
+  positionEvent.collateralReturned = event.params.collateralReturned;
+  positionEvent.tokensBurned = event.params.tokensBurned;
 
   positionEvent.save();
+  emp.save();
 }
 
 // - event: Redeem(indexed address,indexed uint256,indexed uint256)
 //   handler: handleRedeem
+// event Redeem(address indexed sponsor, uint256 indexed collateralAmount, uint256 indexed tokenAmount);
 
 export function handleRedeem(event: Redeem): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateRedeemEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let outstanding = empContract.try_totalTokensOutstanding();
+
+  emp.totalTokensOutstanding = outstanding.reverted
+    ? emp.totalTokensOutstanding
+    : outstanding.value;
 
   positionEvent.contract = emp.id;
+  positionEvent.sponsor = event.params.sponsor.toHexString();
+  positionEvent.collateralAmount = event.params.collateralAmount;
+  positionEvent.tokenAmount = event.params.tokenAmount;
 
   positionEvent.save();
+  emp.save();
 }
 
 // - event: Deposit(indexed address,indexed uint256)
 //   handler: handleDeposit
+// event Deposit(address indexed sponsor, uint256 indexed collateralAmount);
 
 export function handleDeposit(event: Deposit): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateDepositEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let outstanding = empContract.try_totalTokensOutstanding();
+
+  emp.totalTokensOutstanding = outstanding.reverted
+    ? emp.totalTokensOutstanding
+    : outstanding.value;
 
   positionEvent.contract = emp.id;
+  positionEvent.sponsor = event.params.sponsor.toHexString();
+  positionEvent.collateralAmount = event.params.collateralAmount;
 
   positionEvent.save();
+  emp.save();
 }
 
 // - event: Withdrawal(indexed address,indexed uint256)
 //   handler: handleWithdrawal
+// event Withdrawal(address indexed sponsor, uint256 indexed collateralAmount);
 
 export function handleWithdrawal(event: Withdrawal): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateWithdrawalEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let outstanding = empContract.try_totalTokensOutstanding();
+
+  emp.totalTokensOutstanding = outstanding.reverted
+    ? emp.totalTokensOutstanding
+    : outstanding.value;
 
   positionEvent.contract = emp.id;
+  positionEvent.sponsor = event.params.sponsor.toHexString();
+  positionEvent.collateralAmount = event.params.collateralAmount;
 
   positionEvent.save();
+  emp.save();
+}
+
+// - event: NewSponsor(indexed address)
+//   handler: handleNewSponsor
+
+export function handleNewSponsor(event: NewSponsor): void {
+  let emp = getOrCreateFinancialContract(event.address.toHexString());
+  let sponsor = getOrCreateSponsor(event.params.sponsor.toHexString());
+
+  sponsor.contract = emp.id;
+
+  sponsor.save();
 }

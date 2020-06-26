@@ -28,5 +28,6 @@ export {
   getOrCreateSettleExpiredPositionEvent,
   getOrCreateRedeemEvent,
   getOrCreateDepositEvent,
-  getOrCreateWithdrawalEvent
+  getOrCreateWithdrawalEvent,
+  getOrCreateSponsor
 } from "./expiringMultiParty";
