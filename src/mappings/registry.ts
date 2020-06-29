@@ -13,7 +13,8 @@ import {
   getOrCreateParty,
   getOrCreateUser,
   getOrCreateContractCreator,
-  getOrCreateToken
+  getOrCreateToken,
+  calculateGCR
 } from "../utils/helpers";
 import { BIGINT_ONE } from "../utils/constants";
 
@@ -102,29 +103,49 @@ export function handleCreatedExpiringMultiParty(
     event.params.expiringMultiPartyAddress.toHexString()
   );
   let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
-  let empContract = ExpiringMultiParty.bind(event.params.expiringMultiPartyAddress);
+  let empContract = ExpiringMultiParty.bind(
+    event.params.expiringMultiPartyAddress
+  );
 
   let collateral = empContract.try_collateralCurrency();
   let synthetic = empContract.try_tokenCurrency();
   let requirement = empContract.try_collateralRequirement();
   let expiration = empContract.try_expirationTimestamp();
   let totalOutstanding = empContract.try_totalTokensOutstanding();
+  let feeMultiplier = empContract.try_cumulativeFeeMultiplier();
+  let rawCollateral = empContract.try_rawTotalPositionCollateral();
 
-  if(!collateral.reverted) {
+  if (!collateral.reverted) {
     let collateralToken = getOrCreateToken(collateral.value);
     contract.collateralToken = collateralToken.id;
   }
 
-  if(!synthetic.reverted) {
+  if (!synthetic.reverted) {
     let syntheticToken = getOrCreateToken(synthetic.value);
     contract.syntheticToken = syntheticToken.id;
   }
 
   contract.deployer = deployer.id;
   contract.address = event.params.expiringMultiPartyAddress;
-  contract.collateralRequirement = requirement.reverted ? null : requirement.value;
+  contract.collateralRequirement = requirement.reverted
+    ? null
+    : requirement.value;
   contract.expirationTimestamp = expiration.reverted ? null : expiration.value;
-  contract.totalTokensOutstanding = totalOutstanding.reverted ? null : totalOutstanding.value;
+  contract.totalTokensOutstanding = totalOutstanding.reverted
+    ? null
+    : totalOutstanding.value;
+  contract.cumulativeFeeMultiplier = feeMultiplier.reverted
+    ? null
+    : feeMultiplier.value;
+  contract.rawTotalPositionCollateral = rawCollateral.reverted
+    ? null
+    : rawCollateral.value;
+
+  contract.globalCollateralizationRatio = calculateGCR(
+    contract.rawTotalPositionCollateral,
+    contract.cumulativeFeeMultiplier,
+    contract.totalTokensOutstanding
+  );
 
   contract.save();
   deployer.save();

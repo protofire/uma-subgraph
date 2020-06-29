@@ -162,6 +162,10 @@ type FinancialContract @entity {
 
   rawTotalPositionCollateral: BigInt
 
+  cumulativeFeeMultiplier: BigInt
+
+  globalCollateralizationRatio: BigDecimal
+
   totalSyntheticTokensCreated: BigInt!
 
   totalSyntheticTokensBurned: BigInt!

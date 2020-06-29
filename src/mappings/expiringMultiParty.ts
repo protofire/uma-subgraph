@@ -21,9 +21,9 @@ import {
   getOrCreateDepositEvent,
   getOrCreateWithdrawalEvent,
   getOrCreateSponsor,
-  getOrCreateSponsorPosition
+  getOrCreateSponsorPosition,
+  calculateGCR
 } from "../utils/helpers";
-
 
 // - event: FinalFeesPaid(indexed uint256)
 //   handler: handleFinalFeesPaid
@@ -32,6 +32,18 @@ export function handleFinalFeesPaid(event: FinalFeesPaid): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let store = getOrCreateStore();
   let feePaidEvent = getOrCreateFinalFeePaidEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let feeMultiplier = empContract.try_cumulativeFeeMultiplier();
+
+  emp.cumulativeFeeMultiplier = feeMultiplier.reverted
+    ? emp.cumulativeFeeMultiplier
+    : feeMultiplier.value;
+
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   feePaidEvent.totalPaid = event.params.amount;
   feePaidEvent.tx_hash = event.transaction.hash.toHexString();
@@ -53,6 +65,18 @@ export function handleRegularFeesPaid(event: RegularFeesPaid): void {
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let store = getOrCreateStore();
   let feePaidEvent = getOrCreateRegularFeePaidEvent(event);
+  let empContract = ExpiringMultiParty.bind(event.address);
+  let feeMultiplier = empContract.try_cumulativeFeeMultiplier();
+
+  emp.cumulativeFeeMultiplier = feeMultiplier.reverted
+    ? emp.cumulativeFeeMultiplier
+    : feeMultiplier.value;
+
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   feePaidEvent.regularFee = event.params.regularFee;
   feePaidEvent.lateFee = event.params.lateFee;
@@ -95,6 +119,11 @@ export function handlePositionCreated(event: PositionCreated): void {
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
 
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
   positionEvent.contract = emp.id;
   positionEvent.sponsor = event.params.sponsor.toHexString();
   positionEvent.collateralAmount = event.params.collateralAmount;
@@ -135,6 +164,11 @@ export function handleSettleExpiredPosition(
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   positionEvent.contract = emp.id;
   positionEvent.caller = event.params.caller;
@@ -169,16 +203,23 @@ export function handleRedeem(event: Redeem): void {
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   positionEvent.contract = emp.id;
   positionEvent.sponsor = event.params.sponsor.toHexString();
   positionEvent.collateralAmount = event.params.collateralAmount;
   positionEvent.tokenAmount = event.params.tokenAmount;
 
-  sponsorPosition.rawCollateral =
-    sponsorPosition.rawCollateral - event.params.collateralAmount;
-  sponsorPosition.tokensOutstanding =
-    sponsorPosition.tokensOutstanding - event.params.tokenAmount;
+  if (!sponsorPosition.isEnded) {
+    sponsorPosition.rawCollateral =
+      sponsorPosition.rawCollateral - event.params.collateralAmount;
+    sponsorPosition.tokensOutstanding =
+      sponsorPosition.tokensOutstanding - event.params.tokenAmount;
+  }
 
   sponsorPosition.save();
   positionEvent.save();
@@ -207,6 +248,11 @@ export function handleDeposit(event: Deposit): void {
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   positionEvent.contract = emp.id;
   positionEvent.sponsor = event.params.sponsor.toHexString();
@@ -242,6 +288,11 @@ export function handleWithdrawal(event: Withdrawal): void {
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   positionEvent.contract = emp.id;
   positionEvent.sponsor = event.params.sponsor.toHexString();
@@ -296,6 +347,11 @@ export function handleEndedSponsorPosition(event: EndedSponsorPosition): void {
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
     : rawCollateral.value;
+  emp.globalCollateralizationRatio = calculateGCR(
+    emp.rawTotalPositionCollateral,
+    emp.cumulativeFeeMultiplier,
+    emp.totalTokensOutstanding
+  );
 
   sponsorPosition.isEnded = true;
   sponsorPosition.rawCollateral = position.reverted

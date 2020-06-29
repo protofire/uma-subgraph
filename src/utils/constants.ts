@@ -6,3 +6,4 @@ export let VOTING_TOKEN_ADDRESS = Address.fromString("0x04fa0d235c4abf4bcf4787af
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export let BIGINT_ONE_FIXED_POINT = BigInt.fromI32(10).pow(18);

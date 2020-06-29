@@ -9,7 +9,7 @@ import { ExpiringMultiParty, ExpiringMultiPartyCreator } from "../../../generate
 import { ERC20 } from "../../../generated/templates/ExpiringMultiPartyCreator/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 import { DEFAULT_DECIMALS } from "../decimals";
-import { BIGINT_ZERO } from "../constants";
+import { BIGINT_ZERO, BIGINT_ONE_FIXED_POINT } from "../constants";
 
 export function getOrCreateFinancialContract(
   id: String,
@@ -21,6 +21,7 @@ export function getOrCreateFinancialContract(
     contract = new FinancialContract(id);
     contract.totalSyntheticTokensCreated = BIGINT_ZERO;
     contract.totalSyntheticTokensBurned = BIGINT_ZERO;
+    contract.cumulativeFeeMultiplier = BIGINT_ONE_FIXED_POINT; // Hardcoded in the contract
 
     ExpiringMultiParty.create(Address.fromString(id));
   }

@@ -30,5 +30,6 @@ export {
   getOrCreateDepositEvent,
   getOrCreateWithdrawalEvent,
   getOrCreateSponsor,
-  getOrCreateSponsorPosition
+  getOrCreateSponsorPosition,
+  calculateGCR
 } from "./expiringMultiParty";
