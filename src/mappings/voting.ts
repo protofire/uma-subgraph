@@ -19,6 +19,7 @@ import {
   getOrCreateStore,
   getTokenContract
 } from "../utils/helpers";
+import { toDecimal } from "../utils/decimals";
 
 import { log, BigInt } from "@graphprotocol/graph-ts";
 
@@ -53,6 +54,19 @@ export function handleEncryptedVote(event: EncryptedVote): void {
 //  event PriceRequestAdded(uint256 indexed roundId, bytes32 indexed identifier, uint256 time);
 
 export function handlePriceRequestAdded(event: PriceRequestAdded): void {
+  // Workaround needed to get the gatPercentage and inflationRate ASAP.
+  let store = getOrCreateStore();
+  if (store.gatPercentage == null || store.inflationPercentage == null) {
+    let votingContract = Voting.bind(event.address);
+    let gat = votingContract.try_gatPercentage();
+    let inflation = votingContract.try_inflationRate();
+
+    store.gatPercentage = gat.reverted ? null : toDecimal(gat.value);
+    store.inflationPercentage = inflation.reverted
+      ? null
+      : toDecimal(inflation.value);
+  }
+
   let requestId = event.params.identifier
     .toString()
     .concat("-")
@@ -255,7 +269,8 @@ export function handleVoteRevealed(event: VoteRevealed): void {
         requestRound.totalSupplyAtSnapshot.toBigDecimal()
       : null;
   requestRound.tokensWeightedOverTotalSupply =
-    requestRound.tokensWeightedOverTotalSupplyRaw * BigInt.fromI32(100).toBigDecimal();
+    requestRound.tokensWeightedOverTotalSupplyRaw *
+    BigInt.fromI32(100).toBigDecimal();
 
   requestRound.save();
   vote.save();
@@ -268,7 +283,7 @@ export function handleSetGatPercentage(call: SetGatPercentageCall): void {
   ]);
   let store = getOrCreateStore();
 
-  store.gatPercentage = call.inputs.newGatPercentage.rawValue;
+  store.gatPercentage = toDecimal(call.inputs.newGatPercentage.rawValue);
 
   store.save();
 }
@@ -279,7 +294,7 @@ export function handleSetInflationRate(call: SetInflationRateCall): void {
   ]);
   let store = getOrCreateStore();
 
-  store.inflationPercentage = call.inputs.newInflationRate.rawValue;
+  store.inflationPercentage = toDecimal(call.inputs.newInflationRate.rawValue);
 
   store.save();
 }

@@ -86,12 +86,15 @@ dataSources:
         - name: Store
           file: ./abis/Store.json
       eventHandlers:
-        - event: NewFinalFee((uint256))
-          handler: handleNewFinalFee
+        # - event: NewFinalFee((uint256))
+        #   handler: handleNewFinalFee
         - event: NewFixedOracleFeePerSecondPerPfc((uint256))
           handler: handleNewFixedOracleFeePerSecondPerPfc
         - event: NewWeeklyDelayFeePerSecondPerPfc((uint256))
           handler: handleNewWeeklyDelayFeePerSecondPerPfc
+      callHandlers:
+        - function: setFinalFee(address,tuple)
+          handler: handleSetFinalFee
   - kind: ethereum/contract
     name: Voting
     network: mainnet
@@ -226,6 +229,12 @@ templates:
           handler: handleNewSponsor
         - event: EndedSponsorPosition(indexed address)
           handler: handleEndedSponsorPosition
+        # - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
+        #   handler: handleLiquidationCreated
+        # - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
+        #   handler: handleLiquidationDisputed
+        # - event: LiquidationWithdrawn(indexed address,uint256,indexed uint8)
+        #   handler: handleLiquidationWithdrawn
 
   # - ContractExpired(indexed address)
   # + Deposit(indexed address,indexed uint256)
@@ -233,9 +242,9 @@ templates:
   # - EmergencyShutdown(indexed address,uint256,uint256)
   # + EndedSponsorPosition(indexed address)
   # + FinalFeesPaid(indexed uint256)
-  # - LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
-  # - LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
-  # - LiquidationWithdrawn(indexed address,uint256,indexed uint8)
+  # + LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
+  # + LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
+  # + LiquidationWithdrawn(indexed address,uint256,indexed uint8)
   # + NewSponsor(indexed address)
   # + PositionCreated(indexed address,indexed uint256,indexed uint256)
   # + Redeem(indexed address,indexed uint256,indexed uint256)

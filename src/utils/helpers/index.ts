@@ -4,7 +4,7 @@ export { getOrCreateUser, getTokenContract } from "./votingToken";
 
 export { getOrCreatePriceIdentifier } from "./identifierWhitelist";
 
-export { getOrCreateStore } from "./store";
+export { getOrCreateStore, getOrCreateFinalFeePair } from "./store";
 
 export {
   getOrCreateCommitedVote,

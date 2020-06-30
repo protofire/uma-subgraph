@@ -32,7 +32,7 @@ export {
 
 export {
   handleNewWeeklyDelayFeePerSecondPerPfc,
-  handleNewFinalFee,
+  handleSetFinalFee,
   handleNewFixedOracleFeePerSecondPerPfc
 } from "./mappings/store";
 

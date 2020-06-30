@@ -154,21 +154,21 @@ type FinancialContract @entity {
 
   syntheticToken: Token
 
-  collateralRequirement: BigInt
+  collateralRequirement: BigDecimal
 
   expirationTimestamp: BigInt
 
-  totalTokensOutstanding: BigInt
+  totalTokensOutstanding: BigDecimal
 
-  rawTotalPositionCollateral: BigInt
+  rawTotalPositionCollateral: BigDecimal
 
-  cumulativeFeeMultiplier: BigInt
+  cumulativeFeeMultiplier: BigDecimal
 
   globalCollateralizationRatio: BigDecimal
 
-  totalSyntheticTokensCreated: BigInt!
+  totalSyntheticTokensCreated: BigDecimal!
 
-  totalSyntheticTokensBurned: BigInt!
+  totalSyntheticTokensBurned: BigDecimal!
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
@@ -191,9 +191,9 @@ type SponsorPosition @entity {
 
   sponsor: Sponsor!
 
-  rawCollateral: BigInt!
+  rawCollateral: BigDecimal!
 
-  tokensOutstanding: BigInt!
+  tokensOutstanding: BigDecimal!
 
   isEnded: Boolean!
 }
@@ -318,15 +318,16 @@ type Store @entity {
   "Entity that stores the global settings (fees, rates, and more)"
   id: ID!
 
-  gatPercentage: BigInt!
+  gatPercentage: BigDecimal
 
-  inflationPercentage: BigInt!
+  inflationPercentage: BigDecimal
 
-  regularFee: BigInt!
+  regularFee: BigDecimal!
 
-  finalFee: BigInt!
+  "FinalFees are differenty for each currency available. We track them separately on the FinalFeePair entity"
+  finalFees: [FinalFeePair!]! @derivedFrom(field: "store")
 
-  weeklyDelayFee: BigInt!
+  weeklyDelayFee: BigDecimal!
 
   totalFeesPaid: BigInt!
 
@@ -335,6 +336,16 @@ type Store @entity {
   finalFeesPaid: BigInt!
 
   events: [StoreEvent!]! @derivedFrom(field: "store")
+}
+
+type FinalFeePair @entity {
+  id: ID!
+
+  currency: Token!
+
+  store: Store!
+
+  fee: BigDecimal!
 }
 
 interface StoreEvent {

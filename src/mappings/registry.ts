@@ -17,6 +17,7 @@ import {
   calculateGCR
 } from "../utils/helpers";
 import { BIGINT_ONE } from "../utils/constants";
+import { toDecimal } from "../utils/decimals";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
 //   handler: handleNewContractRegistered
@@ -129,17 +130,17 @@ export function handleCreatedExpiringMultiParty(
   contract.address = event.params.expiringMultiPartyAddress;
   contract.collateralRequirement = requirement.reverted
     ? null
-    : requirement.value;
+    : toDecimal(requirement.value);
   contract.expirationTimestamp = expiration.reverted ? null : expiration.value;
   contract.totalTokensOutstanding = totalOutstanding.reverted
     ? null
-    : totalOutstanding.value;
+    : toDecimal(totalOutstanding.value);
   contract.cumulativeFeeMultiplier = feeMultiplier.reverted
     ? null
-    : feeMultiplier.value;
+    : toDecimal(feeMultiplier.value);
   contract.rawTotalPositionCollateral = rawCollateral.reverted
     ? null
-    : rawCollateral.value;
+    : toDecimal(rawCollateral.value);
 
   contract.globalCollateralizationRatio = calculateGCR(
     contract.rawTotalPositionCollateral,

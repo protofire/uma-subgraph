@@ -10,7 +10,7 @@ import {
   SponsorPosition
 } from "../../../generated/schema";
 import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { BIGINT_ZERO } from "../constants";
+import { BIGDECIMAL_ZERO } from "../constants";
 
 export function getOrCreateRegularFeePaidEvent(
   ethereumEvent: ethereum.Event
@@ -145,8 +145,8 @@ export function getOrCreateSponsorPosition(
   if (position == null && createIfNotFound) {
     position = new SponsorPosition(id);
 
-    position.rawCollateral = BIGINT_ZERO;
-    position.tokensOutstanding = BIGINT_ZERO;
+    position.rawCollateral = BIGDECIMAL_ZERO;
+    position.tokensOutstanding = BIGDECIMAL_ZERO;
     position.isEnded = false;
   }
 
@@ -154,16 +154,20 @@ export function getOrCreateSponsorPosition(
 }
 
 export function calculateGCR(
-  feeMultiplier: BigInt | null,
-  rawCollateral: BigInt | null,
-  outstanding: BigInt | null
+  feeMultiplier: BigDecimal | null,
+  rawCollateral: BigDecimal | null,
+  outstanding: BigDecimal | null
 ): BigDecimal | null {
   let gcr: BigDecimal = null;
-  if (outstanding != null && feeMultiplier != null && rawCollateral != null && outstanding != BIGINT_ZERO) {
+  if (
+    outstanding != null &&
+    feeMultiplier != null &&
+    rawCollateral != null &&
+    outstanding != BIGDECIMAL_ZERO
+  ) {
     gcr =
-      ((<BigInt>rawCollateral).toBigDecimal() *
-        (<BigInt>feeMultiplier).toBigDecimal()) /
-      (<BigInt>outstanding).toBigDecimal();
+      (<BigDecimal>rawCollateral * <BigDecimal>feeMultiplier) /
+      <BigDecimal>outstanding;
   }
   return gcr;
 }
