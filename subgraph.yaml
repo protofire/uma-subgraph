@@ -229,16 +229,18 @@ templates:
           handler: handleNewSponsor
         - event: EndedSponsorPosition(indexed address)
           handler: handleEndedSponsorPosition
-        # - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
-        #   handler: handleLiquidationCreated
-        # - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
-        #   handler: handleLiquidationDisputed
-        # - event: LiquidationWithdrawn(indexed address,uint256,indexed uint8)
-        #   handler: handleLiquidationWithdrawn
-
+        - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
+          handler: handleLiquidationCreated
+        - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleLiquidationDisputed
+        - event: DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
+          handler: handleDisputeSettled
+      callHandlers:
+        - function: withdrawLiquidation(uint256,address)
+          handler: handleLiquidationWithdrawn
   # - ContractExpired(indexed address)
   # + Deposit(indexed address,indexed uint256)
-  # - DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
+  # + DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
   # - EmergencyShutdown(indexed address,uint256,uint256)
   # + EndedSponsorPosition(indexed address)
   # + FinalFeesPaid(indexed uint256)

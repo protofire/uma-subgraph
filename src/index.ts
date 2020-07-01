@@ -45,5 +45,9 @@ export {
   handleDeposit,
   handleRedeem,
   handleNewSponsor,
-  handleEndedSponsorPosition
+  handleEndedSponsorPosition,
+  handleLiquidationCreated,
+  handleLiquidationDisputed,
+  handleLiquidationWithdrawn,
+  handleDisputeSettled
 } from "./mappings/expiringMultiParty";

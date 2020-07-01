@@ -31,5 +31,10 @@ export {
   getOrCreateWithdrawalEvent,
   getOrCreateSponsor,
   getOrCreateSponsorPosition,
+  getOrCreateLiquidation,
+  getOrCreateLiquidationCreatedEvent,
+  getOrCreateLiquidationDisputedEvent,
+  getOrCreateLiquidationDisputeSettledEvent,
+  getOrCreateLiquidationWithdrawnEvent,
   calculateGCR
 } from "./expiringMultiParty";

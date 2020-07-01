@@ -411,3 +411,135 @@ type Token @entity {
 
   symbol: String!
 }
+
+enum LiquidationStatus {
+  PreDispute
+  PendingDispute
+  DisputeSucceeded
+  DisputeFailed
+}
+
+type Liquidation @entity {
+  "Liquidation ID is a combination of the Sponsor ID + the internal liquidation id"
+  id: ID!
+
+  status: LiquidationStatus!
+
+  sponsor: Sponsor!
+
+  liquidator: User!
+
+  disputer: User
+
+  liquidationId: BigInt!
+
+  tokensOutstanding: BigDecimal!
+
+  lockedCollateral: BigDecimal!
+
+  liquidatedCollateral: BigDecimal!
+
+  disputeBondAmount: BigDecimal
+
+  disputeSucceeded: Boolean
+
+  amountWithdrawn: BigDecimal
+
+  events: [LiquidationEvent!]! @derivedFrom(field: "liquidation")
+}
+
+interface LiquidationEvent {
+  id: ID!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+
+  liquidation: Liquidation!
+}
+
+type LiquidationCreatedEvent implements LiquidationEvent @entity {
+  id: ID!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+
+  liquidation: Liquidation!
+
+  sponsor: Bytes!
+
+  liquidator: Bytes!
+
+  liquidationId: BigInt!
+
+  tokensOutstanding: BigInt!
+
+  lockedCollateral: BigInt!
+
+  liquidatedCollateral: BigInt!
+}
+
+type LiquidationDisputedEvent implements LiquidationEvent @entity {
+  id: ID!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+
+  liquidation: Liquidation!
+
+  sponsor: Bytes!
+
+  liquidator: Bytes!
+
+  disputer: Bytes!
+
+  liquidationId: BigInt!
+
+  disputeBondAmount: BigInt!
+}
+
+type LiquidationWithdrawnEvent implements LiquidationEvent @entity {
+  id: ID!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+
+  liquidation: Liquidation!
+
+  withdrawalAmount: BigInt!
+}
+
+type LiquidationDisputeSettledEvent implements LiquidationEvent @entity {
+  id: ID!
+
+  tx_hash: String!
+
+  block: BigInt!
+
+  timestamp: BigInt!
+
+  liquidation: Liquidation!
+
+  caller: Bytes!
+
+  sponsor: Bytes!
+
+  liquidator: Bytes!
+
+  disputer: Bytes!
+
+  liquidationId: BigInt!
+
+  disputeSucceeded: Boolean!
+}

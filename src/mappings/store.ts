@@ -31,6 +31,8 @@ export function handleSetFinalFee(call: SetFinalFeeCall): void {
   finalFeePair.fee = toDecimal(call.inputs.newFinalFee.rawValue);
 
   finalFeePair.save();
+  currency.save();
+  store.save();
 }
 
 // - event: NewFixedOracleFeePerSecondPerPfc((uint256))

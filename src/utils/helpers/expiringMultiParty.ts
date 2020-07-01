@@ -7,7 +7,12 @@ import {
   DepositEvent,
   WithdrawalEvent,
   Sponsor,
-  SponsorPosition
+  SponsorPosition,
+  Liquidation,
+  LiquidationCreatedEvent,
+  LiquidationDisputedEvent,
+  LiquidationWithdrawnEvent,
+  LiquidationDisputeSettledEvent
 } from "../../../generated/schema";
 import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { BIGDECIMAL_ZERO } from "../constants";
@@ -170,4 +175,69 @@ export function calculateGCR(
       <BigDecimal>outstanding;
   }
   return gcr;
+}
+
+export function getOrCreateLiquidation(
+  id: String,
+  createIfNotFound: boolean = true
+): Liquidation {
+  let liquidation = Liquidation.load(id);
+
+  if (liquidation == null && createIfNotFound) {
+    liquidation = new Liquidation(id);
+  }
+
+  return liquidation as Liquidation;
+}
+
+export function getOrCreateLiquidationCreatedEvent(
+  id: String,
+  createIfNotFound: boolean = true
+): LiquidationCreatedEvent {
+  let event = LiquidationCreatedEvent.load(id);
+
+  if (event == null && createIfNotFound) {
+    event = new LiquidationCreatedEvent(id);
+  }
+
+  return event as LiquidationCreatedEvent;
+}
+
+export function getOrCreateLiquidationDisputedEvent(
+  id: String,
+  createIfNotFound: boolean = true
+): LiquidationDisputedEvent {
+  let event = LiquidationDisputedEvent.load(id);
+
+  if (event == null && createIfNotFound) {
+    event = new LiquidationDisputedEvent(id);
+  }
+
+  return event as LiquidationDisputedEvent;
+}
+
+export function getOrCreateLiquidationDisputeSettledEvent(
+  id: String,
+  createIfNotFound: boolean = true
+): LiquidationDisputeSettledEvent {
+  let event = LiquidationDisputeSettledEvent.load(id);
+
+  if (event == null && createIfNotFound) {
+    event = new LiquidationDisputeSettledEvent(id);
+  }
+
+  return event as LiquidationDisputeSettledEvent;
+}
+
+export function getOrCreateLiquidationWithdrawnEvent(
+  id: String,
+  createIfNotFound: boolean = true
+): LiquidationWithdrawnEvent {
+  let event = LiquidationWithdrawnEvent.load(id);
+
+  if (event == null && createIfNotFound) {
+    event = new LiquidationWithdrawnEvent(id);
+  }
+
+  return event as LiquidationWithdrawnEvent;
 }

@@ -8,10 +8,15 @@ import {
   SettleExpiredPosition,
   NewSponsor,
   EndedSponsorPosition,
-  ExpiringMultiParty
+  ExpiringMultiParty,
+  LiquidationCreated,
+  LiquidationDisputed,
+  WithdrawLiquidationCall,
+  DisputeSettled
 } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
 import {
   getOrCreateStore,
+  getOrCreateUser,
   getOrCreateFinancialContract,
   getOrCreateRegularFeePaidEvent,
   getOrCreateFinalFeePaidEvent,
@@ -22,9 +27,20 @@ import {
   getOrCreateWithdrawalEvent,
   getOrCreateSponsor,
   getOrCreateSponsorPosition,
+  getOrCreateLiquidation,
+  getOrCreateLiquidationCreatedEvent,
+  getOrCreateLiquidationDisputedEvent,
+  getOrCreateLiquidationDisputeSettledEvent,
+  getOrCreateLiquidationWithdrawnEvent,
   calculateGCR
 } from "../utils/helpers";
 import { toDecimal } from "../utils/decimals";
+import {
+  LIQUIDATION_PRE_DISPUTE,
+  LIQUIDATION_PENDING_DISPUTE,
+  LIQUIDATION_DISPUTE_SUCCEEDED,
+  LIQUIDATION_DISPUTE_FAILED
+} from "../utils/constants";
 
 // - event: FinalFeesPaid(indexed uint256)
 //   handler: handleFinalFeesPaid
@@ -364,4 +380,141 @@ export function handleEndedSponsorPosition(event: EndedSponsorPosition): void {
 
   emp.save();
   sponsorPosition.save();
+}
+
+// - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
+//   handler: handleLiquidationCreated
+
+export function handleLiquidationCreated(event: LiquidationCreated): void {
+  let eventId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString());
+  let liquidationEvent = getOrCreateLiquidationCreatedEvent(eventId);
+  let liquidationId = event.params.sponsor
+    .toHexString()
+    .concat("-")
+    .concat(event.params.liquidationId.toString());
+  let liquidation = getOrCreateLiquidation(liquidationId);
+  let liquidator = getOrCreateUser(event.params.liquidator.toHexString());
+
+  liquidationEvent.tx_hash = event.transaction.hash.toHexString();
+  liquidationEvent.block = event.block.number;
+  liquidationEvent.timestamp = event.block.timestamp;
+  liquidationEvent.liquidation = liquidation.id;
+
+  liquidationEvent.sponsor = event.params.sponsor;
+  liquidationEvent.liquidator = event.params.liquidator;
+  liquidationEvent.liquidationId = event.params.liquidationId;
+  liquidationEvent.tokensOutstanding = event.params.tokensOutstanding;
+  liquidationEvent.lockedCollateral = event.params.lockedCollateral;
+  liquidationEvent.liquidatedCollateral = event.params.liquidatedCollateral;
+
+  liquidation.status = LIQUIDATION_PRE_DISPUTE;
+  liquidation.sponsor = event.params.sponsor.toHexString();
+  liquidation.liquidator = liquidator.id;
+  liquidation.liquidationId = event.params.liquidationId;
+  liquidation.tokensOutstanding = toDecimal(event.params.tokensOutstanding);
+  liquidation.lockedCollateral = toDecimal(event.params.lockedCollateral);
+  liquidation.liquidatedCollateral = toDecimal(
+    event.params.liquidatedCollateral
+  );
+
+  liquidationEvent.save();
+  liquidation.save();
+}
+
+// - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
+//   handler: handleLiquidationDisputed
+
+export function handleLiquidationDisputed(event: LiquidationDisputed): void {
+  let eventId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString());
+  let liquidationEvent = getOrCreateLiquidationDisputedEvent(eventId);
+  let liquidationId = event.params.sponsor
+    .toHexString()
+    .concat("-")
+    .concat(event.params.liquidationId.toString());
+  let liquidation = getOrCreateLiquidation(liquidationId);
+  let disputer = getOrCreateUser(event.params.disputer.toHexString());
+
+  liquidationEvent.tx_hash = event.transaction.hash.toHexString();
+  liquidationEvent.block = event.block.number;
+  liquidationEvent.timestamp = event.block.timestamp;
+  liquidationEvent.liquidation = liquidation.id;
+
+  liquidationEvent.sponsor = event.params.sponsor;
+  liquidationEvent.liquidator = event.params.liquidator;
+  liquidationEvent.disputer = event.params.disputer;
+  liquidationEvent.disputeBondAmount = event.params.disputeBondAmount;
+  liquidationEvent.liquidationId = event.params.liquidationId;
+
+  liquidation.status = LIQUIDATION_PENDING_DISPUTE;
+  liquidation.disputer = disputer.id;
+  liquidation.disputeBondAmount = toDecimal(event.params.disputeBondAmount);
+
+  liquidationEvent.save();
+  liquidation.save();
+}
+
+// - function: withdrawLiquidation(uint256,address)
+//   handler: handleLiquidationWithdrawn
+
+export function handleLiquidationWithdrawn(
+  call: WithdrawLiquidationCall
+): void {
+  // rethink event id
+  // let eventId = call.transaction.hash
+  //   .toHexString()
+  //   .concat("-")
+  //   .concat(call.logIndex.toString());
+  // let liquidationEvent = getOrCreateLiquidationWithdrawnEvent(eventId);
+  // let liquidationId = call.inputs.sponsor
+  //   .toHexString()
+  //   .concat("-")
+  //   .concat(call.inputs.liquidationId.toString());
+  // let liquidation = getOrCreateLiquidation(liquidationId);
+  //
+  // liquidationEvent.tx_hash = call.transaction.hash.toHexString();
+  // liquidationEvent.block = call.block.number;
+  // liquidationEvent.timestamp = call.block.timestamp;
+  // liquidationEvent.liquidation = liquidation.id;
+}
+
+// - event: DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
+//   handler: handleDisputeSettled
+
+export function handleDisputeSettled(event: DisputeSettled): void {
+  let eventId = event.transaction.hash
+    .toHexString()
+    .concat("-")
+    .concat(event.logIndex.toString());
+  let liquidationEvent = getOrCreateLiquidationDisputeSettledEvent(eventId);
+  let liquidationId = event.params.sponsor
+    .toHexString()
+    .concat("-")
+    .concat(event.params.liquidationId.toString());
+  let liquidation = getOrCreateLiquidation(liquidationId);
+
+  liquidationEvent.tx_hash = event.transaction.hash.toHexString();
+  liquidationEvent.block = event.block.number;
+  liquidationEvent.timestamp = event.block.timestamp;
+  liquidationEvent.liquidation = liquidation.id;
+
+  liquidationEvent.sponsor = event.params.sponsor;
+  liquidationEvent.liquidator = event.params.liquidator;
+  liquidationEvent.caller = event.params.caller;
+  liquidationEvent.disputer = event.params.disputer;
+  liquidationEvent.disputeSucceeded = event.params.disputeSucceeded;
+  liquidationEvent.liquidationId = event.params.liquidationId;
+
+  liquidation.status = liquidationEvent.disputeSucceeded
+    ? LIQUIDATION_DISPUTE_SUCCEEDED
+    : LIQUIDATION_DISPUTE_FAILED;
+  liquidation.disputeSucceeded = liquidationEvent.disputeSucceeded;
+
+  liquidationEvent.save();
+  liquidation.save();
 }
