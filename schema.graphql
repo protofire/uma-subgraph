@@ -433,7 +433,7 @@ type Liquidation @entity {
 
   liquidationId: BigInt!
 
-  tokensOutstanding: BigDecimal!
+  tokensLiquidated: BigDecimal!
 
   lockedCollateral: BigDecimal!
 
@@ -458,6 +458,8 @@ interface LiquidationEvent {
   timestamp: BigInt!
 
   liquidation: Liquidation!
+
+  sponsor: Bytes!
 }
 
 type LiquidationCreatedEvent implements LiquidationEvent @entity {
@@ -477,7 +479,7 @@ type LiquidationCreatedEvent implements LiquidationEvent @entity {
 
   liquidationId: BigInt!
 
-  tokensOutstanding: BigInt!
+  tokensLiquidated: BigInt!
 
   lockedCollateral: BigInt!
 
@@ -517,7 +519,9 @@ type LiquidationWithdrawnEvent implements LiquidationEvent @entity {
 
   liquidation: Liquidation!
 
-  withdrawalAmount: BigInt!
+  sponsor: Bytes!
+
+  amountWithdrawn: BigInt!
 }
 
 type LiquidationDisputeSettledEvent implements LiquidationEvent @entity {

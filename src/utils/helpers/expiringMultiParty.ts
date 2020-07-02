@@ -162,8 +162,8 @@ export function calculateGCR(
   feeMultiplier: BigDecimal | null,
   rawCollateral: BigDecimal | null,
   outstanding: BigDecimal | null
-): BigDecimal | null {
-  let gcr: BigDecimal = null;
+): BigDecimal {
+  let gcr: BigDecimal = BIGDECIMAL_ZERO;
   if (
     outstanding != null &&
     feeMultiplier != null &&
