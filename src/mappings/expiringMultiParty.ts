@@ -294,7 +294,7 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
     .concat(event.logIndex.toString());
   let liquidationEvent = getOrCreateLiquidationCreatedEvent(eventId);
   let liquidation = getOrCreateLiquidation(liquidationId);
-  let liquidator = getOrCreateUser(event.params.liquidator.toHexString());
+  let liquidator = getOrCreateUser(event.params.liquidator);
 
   updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 
@@ -339,7 +339,7 @@ export function handleLiquidationDisputed(event: LiquidationDisputed): void {
     .concat(event.logIndex.toString());
   let liquidationEvent = getOrCreateLiquidationDisputedEvent(eventId);
   let liquidation = getOrCreateLiquidation(liquidationId);
-  let disputer = getOrCreateUser(event.params.disputer.toHexString());
+  let disputer = getOrCreateUser(event.params.disputer);
 
   updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 

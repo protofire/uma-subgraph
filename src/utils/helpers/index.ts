@@ -1,6 +1,6 @@
 export { getOrCreateInterfaceImplementation } from "./finder";
 
-export { getOrCreateUser, getTokenContract } from "./votingToken";
+export { getOrCreateUser, getTokenContract, getOrCreateVotingTokenHolder } from "./votingToken";
 
 export { getOrCreatePriceIdentifier } from "./identifierWhitelist";
 

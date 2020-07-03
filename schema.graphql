@@ -1,15 +1,28 @@
 type User @entity {
+  "Utility entity that links data from a single ethereum address. Id of the entity is the ethereum address itself"
   id: ID!
 
-  votingTokenBalance: BigDecimal!
+  address: Bytes!
 
-  votingTokenBalanceRaw: BigInt!
+  "Reference to the related entity that tracks voting token balance. If null then this user is not a token holder"
+  votingTokenHolder: VotingTokenHolder
 
   votesCommited: [CommitedVote!]! @derivedFrom(field: "voter")
 
   votesRevealed: [RevealedVote!]! @derivedFrom(field: "voter")
 
   deployedContracts: [FinancialContract!]! @derivedFrom(field: "deployer")
+}
+
+type VotingTokenHolder @entity {
+  "ID = Ethereum address"
+  id:ID!
+
+  address: Bytes!
+
+  votingTokenBalance: BigDecimal!
+
+  votingTokenBalanceRaw: BigInt!
 }
 
 type InterfaceImplementation @entity {

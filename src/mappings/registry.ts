@@ -103,7 +103,7 @@ export function handleCreatedExpiringMultiParty(
   let contract = getOrCreateFinancialContract(
     event.params.expiringMultiPartyAddress.toHexString()
   );
-  let deployer = getOrCreateUser(event.params.deployerAddress.toHexString());
+  let deployer = getOrCreateUser(event.params.deployerAddress);
   let empContract = ExpiringMultiParty.bind(
     event.params.expiringMultiPartyAddress
   );

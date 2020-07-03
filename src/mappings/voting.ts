@@ -138,7 +138,7 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
     .concat("-")
     .concat(event.params.roundId.toString());
   let rewardClaimed = getOrCreateRewardsClaimed(rewardClaimedId);
-  let claimer = getOrCreateUser(event.params.voter.toHexString());
+  let claimer = getOrCreateUser(event.params.voter);
   let requestId = event.params.identifier
     .toString()
     .concat("-")
@@ -180,7 +180,7 @@ export function handleVoteCommitted(event: VoteCommitted): void {
     .concat("-")
     .concat(event.params.roundId.toString());
   let vote = getOrCreateCommitedVote(voteId);
-  let voter = getOrCreateUser(event.params.voter.toHexString());
+  let voter = getOrCreateUser(event.params.voter);
   let requestId = event.params.identifier
     .toString()
     .concat("-")
@@ -226,7 +226,7 @@ export function handleVoteRevealed(event: VoteRevealed): void {
     .concat("-")
     .concat(event.params.roundId.toString());
   let vote = getOrCreateRevealedVote(voteId);
-  let voter = getOrCreateUser(event.params.voter.toHexString());
+  let voter = getOrCreateUser(event.params.voter);
   let requestId = event.params.identifier
     .toString()
     .concat("-")
