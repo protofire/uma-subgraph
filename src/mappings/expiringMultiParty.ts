@@ -12,7 +12,9 @@ import {
   LiquidationCreated,
   LiquidationDisputed,
   WithdrawLiquidationCall,
-  DisputeSettled
+  DisputeSettled,
+  RequestWithdrawalExecuted,
+  RequestTransferPositionExecuted
 } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
 import {
   getOrCreateStore,
@@ -239,6 +241,7 @@ export function handleWithdrawal(event: Withdrawal): void {
   positionEvent.contract = event.address.toHexString();
   positionEvent.sponsor = event.params.sponsor.toHexString();
   positionEvent.collateralAmount = event.params.collateralAmount;
+  positionEvent.wasRequested = false;
 
   positionEvent.save();
 }
@@ -260,6 +263,8 @@ export function handleNewSponsor(event: NewSponsor): void {
 
   sponsor.save();
   sponsorPosition.save();
+  // Just in case this event triggered because of a transfer
+  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 }
 
 // - event: EndedSponsorPosition(indexed address)
@@ -277,6 +282,22 @@ export function handleEndedSponsorPosition(event: EndedSponsorPosition): void {
   sponsorPosition.isEnded = true;
 
   sponsorPosition.save();
+}
+
+// - event: RequestWithdrawalExecuted(indexed address,indexed uint256)
+//   handler: handleRequestWithdrawalExecuted
+
+export function handleRequestWithdrawalExecuted(event: RequestWithdrawalExecuted): void {
+  let positionEvent = getOrCreateWithdrawalEvent(event);
+
+  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
+
+  positionEvent.contract = event.address.toHexString();
+  positionEvent.sponsor = event.params.sponsor.toHexString();
+  positionEvent.collateralAmount = event.params.collateralAmount;
+  positionEvent.wasRequested = true;
+
+  positionEvent.save();
 }
 
 // - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)

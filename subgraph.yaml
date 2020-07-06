@@ -235,6 +235,8 @@ templates:
           handler: handleLiquidationDisputed
         - event: DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
           handler: handleDisputeSettled
+        - event: RequestWithdrawalExecuted(indexed address,indexed uint256)
+          handler: handleRequestWithdrawalExecuted
       callHandlers:
         - function: withdrawLiquidation(uint256,address)
           handler: handleLiquidationWithdrawn
@@ -256,6 +258,6 @@ templates:
   # - RequestTransferPositionExecuted(indexed address,indexed address)
   # - RequestWithdrawal(indexed address,indexed uint256)
   # - RequestWithdrawalCanceled(indexed address,indexed uint256)
-  # - RequestWithdrawalExecuted(indexed address,indexed uint256)
+  # + RequestWithdrawalExecuted(indexed address,indexed uint256)
   # + SettleExpiredPosition(indexed address,indexed uint256,indexed uint256)
   # + Withdrawal(indexed address,indexed uint256)
