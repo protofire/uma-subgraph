@@ -1,5 +1,4 @@
 import {
-  Party,
   FinancialContract,
   ContractCreator,
   Token
@@ -27,19 +26,6 @@ export function getOrCreateFinancialContract(
   }
 
   return contract as FinancialContract;
-}
-
-export function getOrCreateParty(
-  id: String,
-  createIfNotFound: boolean = true
-): Party {
-  let party = Party.load(id);
-
-  if (party == null && createIfNotFound) {
-    party = new Party(id);
-  }
-
-  return party as Party;
 }
 
 export function getOrCreateContractCreator(

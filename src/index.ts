@@ -22,8 +22,6 @@ export {
 } from "./mappings/identifierWhitelist";
 
 export {
-  handlePartyAdded,
-  handlePartyRemoved,
   handleNewContractRegistered,
   handleAddedSharedMember,
   handleRemovedSharedMember,

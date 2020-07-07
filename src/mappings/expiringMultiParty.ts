@@ -319,6 +319,11 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
 
   updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 
+  let emp = getOrCreateFinancialContract(event.address.toHexString());
+
+  emp.totalSyntheticTokensBurned =
+    emp.totalSyntheticTokensBurned + toDecimal(event.params.tokensOutstanding);
+
   liquidationEvent.tx_hash = event.transaction.hash.toHexString();
   liquidationEvent.block = event.block.number;
   liquidationEvent.timestamp = event.block.timestamp;
@@ -343,6 +348,7 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
 
   liquidationEvent.save();
   liquidation.save();
+  emp.save();
 }
 
 // - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)

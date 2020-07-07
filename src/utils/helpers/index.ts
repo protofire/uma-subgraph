@@ -15,7 +15,6 @@ export {
 } from "./voting";
 
 export {
-  getOrCreateParty,
   getOrCreateFinancialContract,
   getOrCreateContractCreator,
   getOrCreateToken

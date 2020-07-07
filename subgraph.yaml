@@ -152,7 +152,6 @@ dataSources:
       entities:
         - FinancialContract
         - ContractCreator
-        - Party
         - User
       abis:
         - name: Registry
@@ -162,10 +161,6 @@ dataSources:
       eventHandlers:
         - event: NewContractRegistered(indexed address,indexed address,address[])
           handler: handleNewContractRegistered
-        - event: PartyAdded(indexed address,indexed address)
-          handler: handlePartyAdded
-        - event: PartyRemoved(indexed address,indexed address)
-          handler: handlePartyRemoved
         - event: AddedSharedMember(indexed uint256,indexed address,indexed address)
           handler: handleAddedSharedMember
         - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)

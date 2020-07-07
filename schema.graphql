@@ -35,6 +35,7 @@ type InterfaceImplementation @entity {
 type PriceIdentifier @entity {
   id: ID!
 
+  "Depicts whether this PriceIdentifier is currently among the identifiers supported on the whitelist. Will only be false if it was removed from the whitelist."
   isSupported: Boolean!
 
   priceRequests: [PriceRequest!]! @derivedFrom(field: "identifier")
@@ -185,8 +186,6 @@ type FinancialContract @entity {
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
-  parties: [Party!]! @derivedFrom(field: "contract")
-
   sponsorPositions: [SponsorPosition!]! @derivedFrom(field: "contract")
 }
 
@@ -318,15 +317,6 @@ type ContractCreator @entity {
   isRemoved: Boolean!
 
   manager: Bytes
-}
-
-type Party @entity {
-  "Address"
-  id: ID!
-
-  contract: FinancialContract!
-
-  isRemoved: Boolean!
 }
 
 type Store @entity {
