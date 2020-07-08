@@ -13,7 +13,7 @@ import {
   getOrCreateToken,
   calculateGCR
 } from "../utils/helpers";
-import { BIGINT_ONE, GOVERNOR_ADDRESS } from "../utils/constants";
+import { BIGINT_ONE, GOVERNOR_ADDRESS_STRING } from "../utils/constants";
 import { toDecimal } from "../utils/decimals";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
@@ -22,7 +22,7 @@ import { toDecimal } from "../utils/decimals";
 export function handleNewContractRegistered(
   event: NewContractRegistered
 ): void {
-  if(event.params.contractAddress != GOVERNOR_ADDRESS) {
+  if(event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
     let contract = getOrCreateFinancialContract(
       event.params.contractAddress.toHexString()
     );
@@ -74,7 +74,7 @@ export function handleRemovedSharedMember(event: RemovedSharedMember): void {
 export function handleCreatedExpiringMultiParty(
   event: CreatedExpiringMultiParty
 ): void {
-  if(event.params.expiringMultiPartyAddress != GOVERNOR_ADDRESS) {
+  if(event.params.expiringMultiPartyAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
     let contract = getOrCreateFinancialContract(
       event.params.expiringMultiPartyAddress.toHexString()
     );
@@ -92,12 +92,12 @@ export function handleCreatedExpiringMultiParty(
     let rawCollateral = empContract.try_rawTotalPositionCollateral();
 
     if (!collateral.reverted) {
-      let collateralToken = getOrCreateToken(collateral.value);
+      let collateralToken = getOrCreateToken(collateral.value, true, true, false);
       contract.collateralToken = collateralToken.id;
     }
 
     if (!synthetic.reverted) {
-      let syntheticToken = getOrCreateToken(synthetic.value);
+      let syntheticToken = getOrCreateToken(synthetic.value, true, false, true);
       contract.syntheticToken = syntheticToken.id;
     }
 

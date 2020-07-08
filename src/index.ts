@@ -47,5 +47,7 @@ export {
   handleLiquidationCreated,
   handleLiquidationDisputed,
   handleLiquidationWithdrawn,
-  handleDisputeSettled
+  handleDisputeSettled,
+  handleCollateralTransfer,
+  handleSyntheticTransfer
 } from "./mappings/expiringMultiParty";

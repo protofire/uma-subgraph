@@ -151,6 +151,7 @@ export function getOrCreateSponsorPosition(
     position = new SponsorPosition(id);
 
     position.rawCollateral = BIGDECIMAL_ZERO;
+    position.collateral = BIGDECIMAL_ZERO;
     position.tokensOutstanding = BIGDECIMAL_ZERO;
     position.isEnded = false;
   }

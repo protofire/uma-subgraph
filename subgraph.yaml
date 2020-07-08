@@ -166,6 +166,42 @@ dataSources:
         - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)
           handler: handleRemovedSharedMember
 templates:
+  - name: CollateralERC20
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - FinancialContract
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleCollateralTransfer
+  - name: SyntheticERC20
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - FinancialContract
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleSyntheticTransfer
   - name: ExpiringMultiPartyCreator
     kind: ethereum/contract
     network: mainnet

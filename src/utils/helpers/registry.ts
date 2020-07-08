@@ -4,7 +4,12 @@ import {
   Token
 } from "../../../generated/schema";
 import { Address } from "@graphprotocol/graph-ts";
-import { ExpiringMultiParty, ExpiringMultiPartyCreator } from "../../../generated/templates";
+import {
+  CollateralERC20,
+  SyntheticERC20,
+  ExpiringMultiParty,
+  ExpiringMultiPartyCreator
+} from "../../../generated/templates";
 import { ERC20 } from "../../../generated/templates/ExpiringMultiPartyCreator/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 import { DEFAULT_DECIMALS } from "../decimals";
@@ -20,6 +25,10 @@ export function getOrCreateFinancialContract(
     contract = new FinancialContract(id);
     contract.totalSyntheticTokensCreated = BIGDECIMAL_ZERO;
     contract.totalSyntheticTokensBurned = BIGDECIMAL_ZERO;
+    contract.totalCollateralDepositedByTransfer = BIGDECIMAL_ZERO;
+    contract.totalCollateralWithdrawnByTransfer = BIGDECIMAL_ZERO;
+    contract.totalCollateralDeposited = BIGDECIMAL_ZERO;
+    contract.totalCollateralWithdrawn = BIGDECIMAL_ZERO;
     contract.cumulativeFeeMultiplier = BIGDECIMAL_ONE; // Hardcoded in the contract
 
     ExpiringMultiParty.create(Address.fromString(id));
@@ -46,7 +55,9 @@ export function getOrCreateContractCreator(
 
 export function getOrCreateToken(
   tokenAddress: Address,
-  persist: boolean = true
+  persist: boolean = true,
+  indexAsCollateral: boolean = false,
+  indexAsSynthetic: boolean = false
 ): Token {
   let addressString = tokenAddress.toHexString();
 
@@ -67,10 +78,34 @@ export function getOrCreateToken(
       : DEFAULT_DECIMALS;
     token.name = !tokenName.reverted ? tokenName.value : "";
     token.symbol = !tokenSymbol.reverted ? tokenSymbol.value : "";
+    token.indexingAsSynthetic = false;
+    token.indexingAsCollateral = false;
+
+    // if (indexAsSynthetic) {
+    //   SyntheticERC20.create(tokenAddress);
+    //   token.indexingAsSynthetic = true;
+    // }
+
+    if (indexAsCollateral) {
+      CollateralERC20.create(tokenAddress);
+      token.indexingAsCollateral = true;
+    }
 
     if (persist) {
       token.save();
     }
+  }
+
+  // if (indexAsSynthetic && !token.indexingAsSynthetic) {
+  //   SyntheticERC20.create(tokenAddress);
+  //   token.indexingAsSynthetic = true;
+  //   token.save();
+  // }
+
+  if (indexAsCollateral && !token.indexingAsCollateral) {
+    CollateralERC20.create(tokenAddress);
+    token.indexingAsCollateral = true;
+    token.save();
   }
 
   return token as Token;

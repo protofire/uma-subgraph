@@ -176,6 +176,10 @@ type FinancialContract @entity {
 
   rawTotalPositionCollateral: BigDecimal
 
+  totalPositionCollateral: BigDecimal
+
+  rawLiquidationCollateral: BigDecimal
+
   cumulativeFeeMultiplier: BigDecimal
 
   globalCollateralizationRatio: BigDecimal
@@ -183,6 +187,14 @@ type FinancialContract @entity {
   totalSyntheticTokensCreated: BigDecimal!
 
   totalSyntheticTokensBurned: BigDecimal!
+
+  totalCollateralDeposited: BigDecimal!
+
+  totalCollateralWithdrawn: BigDecimal!
+
+  totalCollateralDepositedByTransfer: BigDecimal!
+
+  totalCollateralWithdrawnByTransfer: BigDecimal!
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
@@ -204,6 +216,8 @@ type SponsorPosition @entity {
   sponsor: Sponsor!
 
   rawCollateral: BigDecimal!
+
+  collateral: BigDecimal!
 
   tokensOutstanding: BigDecimal!
 
@@ -415,6 +429,10 @@ type Token @entity {
   name: String!
 
   symbol: String!
+
+  indexingAsCollateral: Boolean!
+
+  indexingAsSynthetic: Boolean!
 }
 
 enum LiquidationStatus {
