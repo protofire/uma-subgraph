@@ -192,10 +192,6 @@ type FinancialContract @entity {
 
   totalCollateralWithdrawn: BigDecimal!
 
-  totalCollateralDepositedByTransfer: BigDecimal!
-
-  totalCollateralWithdrawnByTransfer: BigDecimal!
-
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
   sponsorPositions: [SponsorPosition!]! @derivedFrom(field: "contract")
@@ -354,6 +350,10 @@ type Store @entity {
 
   finalFeesPaid: BigInt!
 
+  withdrawer: Bytes
+
+  totalWithdrawn: BigDecimal!
+
   events: [StoreEvent!]! @derivedFrom(field: "store")
 }
 
@@ -430,9 +430,11 @@ type Token @entity {
 
   symbol: String!
 
+  isOnWhitelist: Boolean!
+
   indexingAsCollateral: Boolean!
 
-  indexingAsSynthetic: Boolean!
+  indexingAsFeeToken: Boolean!
 }
 
 enum LiquidationStatus {

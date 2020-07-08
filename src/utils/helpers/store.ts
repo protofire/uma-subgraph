@@ -11,6 +11,7 @@ export function getOrCreateStore(): Store {
     store.totalFeesPaid = BIGINT_ZERO;
     store.regularFeesPaid = BIGINT_ZERO;
     store.finalFeesPaid = BIGINT_ZERO;
+    store.totalWithdrawn = BIGDECIMAL_ZERO;
   }
 
   return store as Store;

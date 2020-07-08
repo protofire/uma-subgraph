@@ -4,8 +4,17 @@ import {
   NewFixedOracleFeePerSecondPerPfc,
   NewWeeklyDelayFeePerSecondPerPfc
 } from "../../generated/Store/Store";
-import { getOrCreateStore, getOrCreateFinalFeePair, getOrCreateToken } from "../utils/helpers";
+import {
+  RemovedFromWhitelist,
+  AddedToWhitelist
+} from "../../generated/AddressWhitelist/AddressWhitelist";
+import {
+  getOrCreateStore,
+  getOrCreateFinalFeePair,
+  getOrCreateToken
+} from "../utils/helpers";
 import { toDecimal } from "../utils/decimals";
+import { log } from "@graphprotocol/graph-ts";
 
 // // - event: NewFinalFee((uint256))
 // //   handler: handleNewFinalFee
@@ -22,6 +31,10 @@ import { toDecimal } from "../utils/decimals";
 //   handler: handleSetFinalFee
 
 export function handleSetFinalFee(call: SetFinalFeeCall): void {
+  log.warning("setFinalFee called at block: {} tx_hash: {}", [
+    call.block.number.toString(),
+    call.transaction.hash.toHexString()
+  ]);
   let store = getOrCreateStore();
   let currency = getOrCreateToken(call.inputs.currency);
   let finalFeePair = getOrCreateFinalFeePair(currency.id);
@@ -61,4 +74,26 @@ export function handleNewWeeklyDelayFeePerSecondPerPfc(
   );
 
   store.save();
+}
+
+// - event: AddedToWhitelist(indexed address)
+//   handler: handleAddedToWhitelist
+
+export function handleAddedToWhitelist(event: AddedToWhitelist): void {
+  let token = getOrCreateToken(event.params.addedAddress, true, false, true);
+
+  token.isOnWhitelist = true;
+
+  token.save();
+}
+
+// - event: RemovedFromWhitelist(indexed address)
+//   handler: handleRemovedFromWhitelist
+
+export function handleRemovedFromWhitelist(event: RemovedFromWhitelist): void {
+  let token = getOrCreateToken(event.params.removedAddress);
+
+  token.isOnWhitelist = false;
+
+  token.save();
 }

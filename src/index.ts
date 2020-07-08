@@ -31,7 +31,9 @@ export {
 export {
   handleNewWeeklyDelayFeePerSecondPerPfc,
   handleSetFinalFee,
-  handleNewFixedOracleFeePerSecondPerPfc
+  handleNewFixedOracleFeePerSecondPerPfc,
+  handleAddedToWhitelist,
+  handleRemovedFromWhitelist
 } from "./mappings/store";
 
 export {
@@ -49,5 +51,5 @@ export {
   handleLiquidationWithdrawn,
   handleDisputeSettled,
   handleCollateralTransfer,
-  handleSyntheticTransfer
+  handleFeeTransfer
 } from "./mappings/expiringMultiParty";

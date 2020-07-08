@@ -6,7 +6,7 @@ import {
 import { Address } from "@graphprotocol/graph-ts";
 import {
   CollateralERC20,
-  SyntheticERC20,
+  FeeERC20,
   ExpiringMultiParty,
   ExpiringMultiPartyCreator
 } from "../../../generated/templates";
@@ -25,8 +25,6 @@ export function getOrCreateFinancialContract(
     contract = new FinancialContract(id);
     contract.totalSyntheticTokensCreated = BIGDECIMAL_ZERO;
     contract.totalSyntheticTokensBurned = BIGDECIMAL_ZERO;
-    contract.totalCollateralDepositedByTransfer = BIGDECIMAL_ZERO;
-    contract.totalCollateralWithdrawnByTransfer = BIGDECIMAL_ZERO;
     contract.totalCollateralDeposited = BIGDECIMAL_ZERO;
     contract.totalCollateralWithdrawn = BIGDECIMAL_ZERO;
     contract.cumulativeFeeMultiplier = BIGDECIMAL_ONE; // Hardcoded in the contract
@@ -57,7 +55,7 @@ export function getOrCreateToken(
   tokenAddress: Address,
   persist: boolean = true,
   indexAsCollateral: boolean = false,
-  indexAsSynthetic: boolean = false
+  indexAsFeeToken: boolean = false
 ): Token {
   let addressString = tokenAddress.toHexString();
 
@@ -78,13 +76,14 @@ export function getOrCreateToken(
       : DEFAULT_DECIMALS;
     token.name = !tokenName.reverted ? tokenName.value : "";
     token.symbol = !tokenSymbol.reverted ? tokenSymbol.value : "";
-    token.indexingAsSynthetic = false;
+    token.indexingAsFeeToken = false;
     token.indexingAsCollateral = false;
+    token.isOnWhitelist = false;
 
-    // if (indexAsSynthetic) {
-    //   SyntheticERC20.create(tokenAddress);
-    //   token.indexingAsSynthetic = true;
-    // }
+    if (indexAsFeeToken) {
+      FeeERC20.create(tokenAddress);
+      token.indexingAsFeeToken = true;
+    }
 
     if (indexAsCollateral) {
       CollateralERC20.create(tokenAddress);
@@ -96,11 +95,11 @@ export function getOrCreateToken(
     }
   }
 
-  // if (indexAsSynthetic && !token.indexingAsSynthetic) {
-  //   SyntheticERC20.create(tokenAddress);
-  //   token.indexingAsSynthetic = true;
-  //   token.save();
-  // }
+  if (indexAsFeeToken && !token.indexingAsFeeToken) {
+    FeeERC20.create(tokenAddress);
+    token.indexingAsFeeToken = true;
+    token.save();
+  }
 
   if (indexAsCollateral && !token.indexingAsCollateral) {
     CollateralERC20.create(tokenAddress);
