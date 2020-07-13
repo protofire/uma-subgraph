@@ -53,3 +53,5 @@ export {
   handleCollateralTransfer,
   handleFeeTransfer
 } from "./mappings/expiringMultiParty";
+
+export { handleProposalExecuted, handleNewProposal } from "./mappings/governor";

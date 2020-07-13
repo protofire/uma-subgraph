@@ -113,6 +113,8 @@ dataSources:
       abis:
         - name: AddressWhitelist
           file: ./abis/AddressWhitelist.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: AddedToWhitelist(indexed address)
           handler: handleAddedToWhitelist
@@ -188,6 +190,29 @@ dataSources:
           handler: handleAddedSharedMember
         - event: RemovedSharedMember(indexed uint256,indexed address,indexed address)
           handler: handleRemovedSharedMember
+  # - kind: ethereum/contract
+  #   name: Governor
+  #   network: mainnet
+  #   source:
+  #     address: "0x592349f7dedb2b75f9d4f194d4b7c16d82e507dc"
+  #     abi: Governor
+  #     startBlock: 9937467
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.4
+  #     language: wasm/assemblyscript
+  #     file: ./src/index.ts
+  #     entities:
+  #       - Proposal
+  #       - PriceRequest
+  #     abis:
+  #       - name: Governor
+  #         file: ./abis/Governor.json
+  #     eventHandlers:
+  #       - event: NewProposal(indexed uint256,tuple[])
+  #         handler: handleNewProposal
+  #       - event: ProposalExecuted(indexed uint256,uint256)
+  #         handler: handleProposalExecuted
 templates:
   - name: CollateralERC20
     kind: ethereum/contract
@@ -222,6 +247,8 @@ templates:
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Store
+          file: ./abis/Store.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleFeeTransfer

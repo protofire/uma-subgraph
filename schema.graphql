@@ -572,3 +572,27 @@ type LiquidationDisputeSettledEvent implements LiquidationEvent @entity {
 
   disputeSucceeded: Boolean!
 }
+
+type Proposal @entity {
+  id: ID!
+
+  request: PriceRequest!
+
+  transactions: [ProposalTransaction!]! @derivedFrom(field: "proposal")
+
+  transactionAmount: Int!
+}
+
+type ProposalTransaction @entity {
+  id: ID!
+
+  proposal: Proposal!
+
+  to: Bytes!
+
+  value: BigInt!
+
+  data: Bytes!
+
+  isExecuted: Boolean!
+}

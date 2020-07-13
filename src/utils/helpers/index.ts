@@ -1,6 +1,10 @@
 export { getOrCreateInterfaceImplementation } from "./finder";
 
-export { getOrCreateUser, getTokenContract, getOrCreateVotingTokenHolder } from "./votingToken";
+export {
+  getOrCreateUser,
+  getTokenContract,
+  getOrCreateVotingTokenHolder
+} from "./votingToken";
 
 export { getOrCreatePriceIdentifier } from "./identifierWhitelist";
 
@@ -37,3 +41,5 @@ export {
   getOrCreateLiquidationWithdrawnEvent,
   calculateGCR
 } from "./expiringMultiParty";
+
+export { getOrCreateProposal, getOrCreateProposalTransaction } from "./governor";
