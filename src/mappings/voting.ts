@@ -9,6 +9,7 @@ import {
   SetInflationRateCall,
   Voting
 } from "../../generated/Voting/Voting";
+import { VoterGroup } from "../../generated/schema";
 import {
   getOrCreateUser,
   getOrCreateCommitedVote,
@@ -17,11 +18,13 @@ import {
   getOrCreateRewardsClaimed,
   getOrCreatePriceRequestRound,
   getOrCreateStore,
-  getTokenContract
+  getTokenContract,
+  getOrCreateVoterGroup
 } from "../utils/helpers";
 import { toDecimal } from "../utils/decimals";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE } from "../utils/constants";
 
-import { log, BigInt } from "@graphprotocol/graph-ts";
+import { log, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
 // - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
 //   handler: handleEncryptedVote
@@ -102,6 +105,10 @@ export function handlePriceResolved(event: PriceResolved): void {
   let requestRound = getOrCreatePriceRequestRound(
     requestId.concat("-").concat(event.params.roundId.toString())
   );
+  let groupId = requestRound.id
+    .concat("-")
+    .concat(event.params.price.toString());
+  let voterGroup = getOrCreateVoterGroup(groupId);
 
   request.latestRound = requestRound.id;
   request.price = event.params.price;
@@ -110,13 +117,21 @@ export function handlePriceResolved(event: PriceResolved): void {
   request.resolutionBlock = event.block.number;
   request.isResolved = true;
 
+  voterGroup.won = true;
+
   requestRound.request = request.id;
   requestRound.identifier = event.params.identifier.toString();
   requestRound.time = event.params.time;
   requestRound.roundId = event.params.roundId;
+  requestRound.eligibleForRewardsRatio =
+    voterGroup.votersAmount / requestRound.votersAmount;
+  requestRound.eligibleForRewardsPercentage =
+    requestRound.eligibleForRewardsRatio * BIGDECIMAL_HUNDRED;
+  requestRound.winnerGroup = voterGroup.id;
 
   requestRound.save();
   request.save();
+  voterGroup.save();
 }
 
 // - event: RewardsRetrieved(indexed address,indexed uint256,indexed bytes32,uint256,uint256)
@@ -147,6 +162,7 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
   let requestRound = getOrCreatePriceRequestRound(
     requestId.concat("-").concat(event.params.roundId.toString())
   );
+  let winnerGroup = requestRound.winnerGroup as VoterGroup;
 
   rewardClaimed.claimer = claimer.id;
   rewardClaimed.round = requestRound.id;
@@ -160,7 +176,12 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
   requestRound.time = event.params.time;
   requestRound.roundId = event.params.roundId;
   requestRound.totalRewardsClaimed =
-    requestRound.totalRewardsClaimed + rewardClaimed.numTokens;
+    requestRound.totalRewardsClaimed + toDecimal(rewardClaimed.numTokens);
+  requestRound.claimedAmount = requestRound.claimedAmount + BIGDECIMAL_ONE;
+  requestRound.claimedRatio =
+    requestRound.claimedAmount / winnerGroup.votersAmount;
+  requestRound.claimedPercentage =
+    requestRound.claimedRatio * BIGDECIMAL_HUNDRED;
 
   requestRound.save();
   rewardClaimed.save();
@@ -235,6 +256,10 @@ export function handleVoteRevealed(event: VoteRevealed): void {
   let requestRound = getOrCreatePriceRequestRound(
     requestId.concat("-").concat(event.params.roundId.toString())
   );
+  let groupId = requestRound.id
+    .concat("-")
+    .concat(event.params.price.toString());
+  let voterGroup = getOrCreateVoterGroup(groupId);
   let votingContract = Voting.bind(event.address);
   let roundInfo = votingContract.try_rounds(event.params.roundId);
 
@@ -245,13 +270,21 @@ export function handleVoteRevealed(event: VoteRevealed): void {
   vote.time = event.params.time;
   vote.price = event.params.price;
   vote.numTokens = event.params.numTokens;
+  vote.group = voterGroup.id;
+
+  voterGroup.price = event.params.price;
+  voterGroup.round = requestRound.id;
+  voterGroup.totalVoteAmount =
+    voterGroup.totalVoteAmount + toDecimal(vote.numTokens);
+  voterGroup.votersAmount = voterGroup.votersAmount + BIGDECIMAL_ONE;
 
   requestRound.request = requestId;
   requestRound.identifier = event.params.identifier.toString();
   requestRound.time = event.params.time;
   requestRound.roundId = event.params.roundId;
   requestRound.totalVotesRevealed =
-    requestRound.totalVotesRevealed + vote.numTokens;
+    requestRound.totalVotesRevealed + toDecimal(vote.numTokens);
+  requestRound.votersAmount = requestRound.votersAmount + BIGDECIMAL_ONE;
   requestRound.snapshotId = roundInfo.reverted ? null : roundInfo.value.value0;
   if (
     requestRound.snapshotId != null &&
@@ -262,20 +295,19 @@ export function handleVoteRevealed(event: VoteRevealed): void {
     );
     requestRound.totalSupplyAtSnapshot = supply.reverted
       ? null
-      : (supply.value as BigInt);
+      : toDecimal(supply.value as BigInt);
   }
-  requestRound.tokensWeightedOverTotalSupplyRaw =
+  requestRound.tokenVoteParticipationRatio =
     requestRound.totalSupplyAtSnapshot != null
-      ? requestRound.totalVotesRevealed.toBigDecimal() /
-        requestRound.totalSupplyAtSnapshot.toBigDecimal()
+      ? requestRound.totalVotesRevealed / <BigDecimal>requestRound.totalSupplyAtSnapshot
       : null;
-  requestRound.tokensWeightedOverTotalSupply =
-    requestRound.tokensWeightedOverTotalSupplyRaw *
-    BigInt.fromI32(100).toBigDecimal();
+  requestRound.tokenVoteParticipationPercentage =
+    requestRound.tokenVoteParticipationRatio * BIGDECIMAL_HUNDRED;
 
   requestRound.save();
   vote.save();
   voter.save();
+  voterGroup.save();
 }
 
 export function handleSetGatPercentage(call: SetGatPercentageCall): void {

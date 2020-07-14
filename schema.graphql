@@ -12,6 +12,12 @@ type User @entity {
   votesRevealed: [RevealedVote!]! @derivedFrom(field: "voter")
 
   deployedContracts: [FinancialContract!]! @derivedFrom(field: "deployer")
+
+  "List of all the liquidations where this user acted as disputer"
+  liquidationsDisputed: [Liquidation!]! @derivedFrom(field: "disputer")
+
+  "List of all the liquidations that this user triggered as a liquidator"
+  liquidationsTriggered: [Liquidation!]! @derivedFrom(field: "liquidator")
 }
 
 type VotingTokenHolder @entity {
@@ -38,6 +44,7 @@ type PriceIdentifier @entity {
   "Depicts whether this PriceIdentifier is currently among the identifiers supported on the whitelist. Will only be false if it was removed from the whitelist."
   isSupported: Boolean!
 
+  "List of all the PriceRequest entities related to this particular PriceIdentifier."
   priceRequests: [PriceRequest!]! @derivedFrom(field: "identifier")
 }
 
@@ -45,28 +52,40 @@ type PriceRequest @entity {
   "ID is the PriceIdentifier ID + the timestamp"
   id: ID!
 
+  "Depicts whether the request has been resolved"
   isResolved: Boolean!
 
+  "Price resolved for this request"
   price: BigInt
 
+  "PriceRequestRound entity corresponding to the last round of voting"
   latestRound: PriceRequestRound!
 
+  "Timestamp when the PriceRequest was requested"
   time: BigInt!
 
+  "PriceIdentifier for the request"
   identifier: PriceIdentifier!
 
+  "Transaction where the resolution of the request took place"
   resolutionTransaction: Bytes
 
+  "Timestamp when the resolution of the request took place"
   resolutionTimestamp: BigInt
 
+  "Block number when the resolution of the request took place"
   resolutionBlock: BigInt
 
+  "List of all the rounds involved in this PriceRequest"
   rounds: [PriceRequestRound!]! @derivedFrom(field: "request")
 
+  "List of all the votes commited on this request"
   commitedVotes: [CommitedVote!]! @derivedFrom(field: "request")
 
+  "List of all the votes revealed on this request"
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "request")
 
+  "List of all the rewards claimed events for this request"
   rewardsClaimed: [RewardsClaimed!]! @derivedFrom(field: "request")
 }
 
@@ -84,23 +103,62 @@ type PriceRequestRound @entity {
 
   snapshotId: BigInt
 
-  totalVotesRevealed: BigInt!
+  "Total amount of users who voted on this round"
+  votersAmount: BigDecimal!
 
-  totalRewardsClaimed: BigInt!
+  "Total amount of users who claimed rewards on this round"
+  claimedAmount: BigDecimal!
 
-  totalSupplyAtSnapshot: BigInt
+  totalVotesRevealed: BigDecimal!
+
+  totalRewardsClaimed: BigDecimal!
+
+  totalSupplyAtSnapshot: BigDecimal
 
   "Ratio of the total supply of tokens that were weighted on this vote"
-  tokensWeightedOverTotalSupplyRaw: BigDecimal
+  tokenVoteParticipationRatio: BigDecimal
 
   "Percentage of the total supply of tokens that were weighted on this vote"
-  tokensWeightedOverTotalSupply: BigDecimal
+  tokenVoteParticipationPercentage: BigDecimal
+
+  "Ratio of correct voters over total voters on this price request"
+  eligibleForRewardsRatio: BigDecimal
+
+  "Percentage of correct voters over total voters on this price request"
+  eligibleForRewardsPercentage: BigDecimal
+
+  "Ratio of correct voters who claimed their rewards"
+  claimedRatio: BigDecimal
+
+  "Percentage of correct voters who claimed their rewards"
+  claimedPercentage: BigDecimal
+
+  winnerGroup: VoterGroup
 
   commitedVotes: [CommitedVote!]! @derivedFrom(field: "round")
 
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "round")
 
+  groups: [VoterGroup!]! @derivedFrom(field: "round")
+
   rewardsClaimed: [RewardsClaimed!]! @derivedFrom(field: "round")
+}
+
+type VoterGroup @entity {
+  "Just a helper entity to group voters who voted the same price result. ID is composed of round ID + voted price"
+  id: ID!
+
+  price: BigInt!
+
+  round: PriceRequestRound!
+
+  votes: [RevealedVote!]! @derivedFrom(field: "group")
+
+  totalVoteAmount: BigDecimal!
+
+  votersAmount: BigDecimal!
+
+  won: Boolean!
 }
 
 type CommitedVote @entity {
@@ -136,6 +194,8 @@ type RevealedVote @entity {
   voter: User!
 
   numTokens: BigInt!
+
+  group: VoterGroup!
 }
 
 type RewardsClaimed @entity {
@@ -158,18 +218,25 @@ type FinancialContract @entity {
   "Blockchain address of the contract"
   id: ID!
 
+  "ExternalMultiPartyCreator contract used to create this contract"
   creator: ContractCreator
 
+  "User that deployed the contract"
   deployer: User
 
+  "Address of the contract"
   address: Bytes!
 
+  "Token used as collateral for this contract"
   collateralToken: Token
 
+  "Synthetic token for this contract"
   syntheticToken: Token
 
+  "Minimum required collateral for proper collateralization"
   collateralRequirement: BigDecimal
 
+  "Expiration timestamp of the financial contract."
   expirationTimestamp: BigInt
 
   totalTokensOutstanding: BigDecimal
@@ -198,6 +265,7 @@ type FinancialContract @entity {
 }
 
 type Sponsor @entity {
+  "A token sponsor is someone who holds positions on financial contracts."
   id: ID!
 
   positions: [SponsorPosition!]! @derivedFrom(field: "sponsor")
@@ -207,16 +275,21 @@ type SponsorPosition @entity {
   "Sponsor ID + FinancialContract ID"
   id: ID!
 
+  "Contract where the sponsor has a position"
   contract: FinancialContract!
 
+  "Sponsor who has the position"
   sponsor: Sponsor!
 
+  "Collateral used to back the position"
   rawCollateral: BigDecimal!
 
   collateral: BigDecimal!
 
+  "Synthetic token outstanding"
   tokensOutstanding: BigDecimal!
 
+  "Depicts whether the position has been ended or not"
   isEnded: Boolean!
 }
 
@@ -324,9 +397,14 @@ type ContractCreator @entity {
   "This entity represent a single contract creator (EMP Creator). The id is the blockchain address of the EMPCreator"
   id: ID!
 
+  "Whether or not this creator has been removed from the whitelist of creators"
   isRemoved: Boolean!
 
+  "Manager of the contract creator address"
   manager: Bytes
+
+  "List of all the contracts created from this Creator"
+  contractsCreated: [FinancialContract!]! @derivedFrom(field: "creator")
 }
 
 type Store @entity {
@@ -339,7 +417,7 @@ type Store @entity {
 
   regularFee: BigDecimal!
 
-  "FinalFees are differenty for each currency available. We track them separately on the FinalFeePair entity"
+  "FinalFee values are different for each currency available. We track them separately on the FinalFeePair entity"
   finalFees: [FinalFeePair!]! @derivedFrom(field: "store")
 
   weeklyDelayFee: BigDecimal!
@@ -350,6 +428,7 @@ type Store @entity {
 
   finalFeesPaid: BigInt!
 
+  "Address of the withdrawer as of the last withdraw"
   withdrawer: Bytes
 
   totalWithdrawn: BigDecimal!
@@ -430,10 +509,13 @@ type Token @entity {
 
   symbol: String!
 
+  "Depicts whether this token is whitelisted in the AddressWhitelist contract"
   isOnWhitelist: Boolean!
 
+  "Depicts whether this token is being indexed by the subgraph as a CollateralToken for at least one FinancialContract"
   indexingAsCollateral: Boolean!
 
+  "Depicts whether this token is being indexed by the subgraph as a FeeToken for the Store entity"
   indexingAsFeeToken: Boolean!
 }
 
@@ -448,14 +530,19 @@ type Liquidation @entity {
   "Liquidation ID is a combination of the Sponsor ID + the internal liquidation id"
   id: ID!
 
+  "Current status of the liquidation"
   status: LiquidationStatus!
 
+  "Sponsor who is having its position liquidated"
   sponsor: Sponsor!
 
+  "User who is liquidating the position"
   liquidator: User!
 
+  "User who is disputing the liquidation"
   disputer: User
 
+  "Internal ID of the liquidationData"
   liquidationId: BigInt!
 
   tokensLiquidated: BigDecimal!

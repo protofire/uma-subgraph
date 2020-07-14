@@ -15,7 +15,8 @@ export {
   getOrCreatePriceRequest,
   getOrCreatePriceRequestRound,
   getOrCreateRevealedVote,
-  getOrCreateRewardsClaimed
+  getOrCreateRewardsClaimed,
+  getOrCreateVoterGroup
 } from "./voting";
 
 export {

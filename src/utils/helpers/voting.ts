@@ -3,9 +3,10 @@ import {
   PriceRequestRound,
   CommitedVote,
   RevealedVote,
-  RewardsClaimed
+  RewardsClaimed,
+  VoterGroup
 } from "../../../generated/schema";
-import { BIGINT_ZERO } from "../constants";
+import { BIGDECIMAL_ZERO } from "../constants";
 
 export function getOrCreatePriceRequest(
   id: String,
@@ -30,8 +31,10 @@ export function getOrCreatePriceRequestRound(
   if (requestRound == null && createIfNotFound) {
     requestRound = new PriceRequestRound(id);
 
-    requestRound.totalVotesRevealed = BIGINT_ZERO;
-    requestRound.totalRewardsClaimed = BIGINT_ZERO;
+    requestRound.totalVotesRevealed = BIGDECIMAL_ZERO;
+    requestRound.totalRewardsClaimed = BIGDECIMAL_ZERO;
+    requestRound.votersAmount = BIGDECIMAL_ZERO;
+    requestRound.claimedAmount = BIGDECIMAL_ZERO;
   }
 
   return requestRound as PriceRequestRound;
@@ -74,4 +77,20 @@ export function getOrCreateRewardsClaimed(
   }
 
   return rewards as RewardsClaimed;
+}
+
+export function getOrCreateVoterGroup(
+  id: String,
+  createIfNotFound: boolean = true
+): VoterGroup {
+  let group = VoterGroup.load(id);
+
+  if (group == null && createIfNotFound) {
+    group = new VoterGroup(id);
+    group.won = false;
+    group.totalVoteAmount = BIGDECIMAL_ZERO;
+    group.votersAmount = BIGDECIMAL_ZERO;
+  }
+
+  return group as VoterGroup;
 }

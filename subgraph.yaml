@@ -1,5 +1,5 @@
 specVersion: 0.0.2
-description: UMA protocol subgraph
+description: Subgraph with support for the DVM data and synthetic tokens made with UMA, as well as supported identifiers, token holder balances and many more.
 repository: https://github.com/protofire/uma-subgraph
 schema:
   file: ./schema.graphql
