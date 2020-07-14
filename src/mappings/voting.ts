@@ -108,6 +108,7 @@ export function handlePriceResolved(event: PriceResolved): void {
   request.resolutionTransaction = event.transaction.hash;
   request.resolutionTimestamp = event.block.timestamp;
   request.resolutionBlock = event.block.number;
+  request.isResolved = true;
 
   requestRound.request = request.id;
   requestRound.identifier = event.params.identifier.toString();
