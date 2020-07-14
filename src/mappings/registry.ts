@@ -22,11 +22,13 @@ import { toDecimal } from "../utils/decimals";
 export function handleNewContractRegistered(
   event: NewContractRegistered
 ): void {
-  if(event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
+  if (event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
     let contract = getOrCreateFinancialContract(
       event.params.contractAddress.toHexString()
     );
-    let creator = getOrCreateContractCreator(event.params.creator.toHexString());
+    let creator = getOrCreateContractCreator(
+      event.params.creator.toHexString()
+    );
 
     contract.address = event.params.contractAddress;
     contract.creator = creator.id;
@@ -74,7 +76,10 @@ export function handleRemovedSharedMember(event: RemovedSharedMember): void {
 export function handleCreatedExpiringMultiParty(
   event: CreatedExpiringMultiParty
 ): void {
-  if(event.params.expiringMultiPartyAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
+  if (
+    event.params.expiringMultiPartyAddress.toHexString() !=
+    GOVERNOR_ADDRESS_STRING
+  ) {
     let contract = getOrCreateFinancialContract(
       event.params.expiringMultiPartyAddress.toHexString()
     );
@@ -92,7 +97,12 @@ export function handleCreatedExpiringMultiParty(
     let rawCollateral = empContract.try_rawTotalPositionCollateral();
 
     if (!collateral.reverted) {
-      let collateralToken = getOrCreateToken(collateral.value, true, true, false);
+      let collateralToken = getOrCreateToken(
+        collateral.value,
+        true,
+        true,
+        false
+      );
       contract.collateralToken = collateralToken.id;
     }
 
@@ -104,18 +114,20 @@ export function handleCreatedExpiringMultiParty(
     contract.deployer = deployer.id;
     contract.address = event.params.expiringMultiPartyAddress;
     contract.collateralRequirement = requirement.reverted
-    ? null
-    : toDecimal(requirement.value);
-    contract.expirationTimestamp = expiration.reverted ? null : expiration.value;
+      ? null
+      : toDecimal(requirement.value);
+    contract.expirationTimestamp = expiration.reverted
+      ? null
+      : expiration.value;
     contract.totalTokensOutstanding = totalOutstanding.reverted
-    ? null
-    : toDecimal(totalOutstanding.value);
+      ? null
+      : toDecimal(totalOutstanding.value);
     contract.cumulativeFeeMultiplier = feeMultiplier.reverted
-    ? null
-    : toDecimal(feeMultiplier.value);
+      ? null
+      : toDecimal(feeMultiplier.value);
     contract.rawTotalPositionCollateral = rawCollateral.reverted
-    ? null
-    : toDecimal(rawCollateral.value);
+      ? null
+      : toDecimal(rawCollateral.value);
 
     contract.globalCollateralizationRatio = calculateGCR(
       contract.rawTotalPositionCollateral,

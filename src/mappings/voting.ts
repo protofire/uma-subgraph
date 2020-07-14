@@ -162,7 +162,7 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
   let requestRound = getOrCreatePriceRequestRound(
     requestId.concat("-").concat(event.params.roundId.toString())
   );
-  let winnerGroup = requestRound.winnerGroup as VoterGroup;
+  let winnerGroup : VoterGroup | null = requestRound.winnerGroup != null ? getOrCreateVoterGroup(requestRound.winnerGroup) : null;
 
   rewardClaimed.claimer = claimer.id;
   rewardClaimed.round = requestRound.id;
@@ -179,7 +179,9 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
     requestRound.totalRewardsClaimed + toDecimal(rewardClaimed.numTokens);
   requestRound.claimedAmount = requestRound.claimedAmount + BIGDECIMAL_ONE;
   requestRound.claimedRatio =
-    requestRound.claimedAmount / winnerGroup.votersAmount;
+    winnerGroup != null
+      ? requestRound.claimedAmount / winnerGroup.votersAmount
+      : requestRound.claimedRatio;
   requestRound.claimedPercentage =
     requestRound.claimedRatio * BIGDECIMAL_HUNDRED;
 
@@ -299,7 +301,8 @@ export function handleVoteRevealed(event: VoteRevealed): void {
   }
   requestRound.tokenVoteParticipationRatio =
     requestRound.totalSupplyAtSnapshot != null
-      ? requestRound.totalVotesRevealed / <BigDecimal>requestRound.totalSupplyAtSnapshot
+      ? requestRound.totalVotesRevealed /
+        <BigDecimal>requestRound.totalSupplyAtSnapshot
       : null;
   requestRound.tokenVoteParticipationPercentage =
     requestRound.tokenVoteParticipationRatio * BIGDECIMAL_HUNDRED;
