@@ -211,6 +211,7 @@ type RewardsClaimed @entity {
 
   claimer: User!
 
+  "NumTokens will be 0 if the claim is not 'valid'. This can happen if the function was called for a voter who didn't get the correct vote for example."
   numTokens: BigInt!
 }
 

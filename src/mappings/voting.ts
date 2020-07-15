@@ -22,7 +22,7 @@ import {
   getOrCreateVoterGroup
 } from "../utils/helpers";
 import { toDecimal } from "../utils/decimals";
-import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE } from "../utils/constants";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGINT_ZERO } from "../utils/constants";
 
 import { log, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
@@ -162,7 +162,10 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
   let requestRound = getOrCreatePriceRequestRound(
     requestId.concat("-").concat(event.params.roundId.toString())
   );
-  let winnerGroup : VoterGroup | null = requestRound.winnerGroup != null ? getOrCreateVoterGroup(requestRound.winnerGroup) : null;
+  let winnerGroup: VoterGroup | null =
+    requestRound.winnerGroup != null
+      ? getOrCreateVoterGroup(requestRound.winnerGroup)
+      : null;
 
   rewardClaimed.claimer = claimer.id;
   rewardClaimed.round = requestRound.id;
@@ -177,13 +180,15 @@ export function handleRewardsRetrieved(event: RewardsRetrieved): void {
   requestRound.roundId = event.params.roundId;
   requestRound.totalRewardsClaimed =
     requestRound.totalRewardsClaimed + toDecimal(rewardClaimed.numTokens);
-  requestRound.claimedAmount = requestRound.claimedAmount + BIGDECIMAL_ONE;
-  requestRound.claimedRatio =
-    winnerGroup != null
-      ? requestRound.claimedAmount / winnerGroup.votersAmount
-      : requestRound.claimedRatio;
-  requestRound.claimedPercentage =
-    requestRound.claimedRatio * BIGDECIMAL_HUNDRED;
+  if (rewardClaimed.numTokens > BIGINT_ZERO) {
+    requestRound.claimedAmount = requestRound.claimedAmount + BIGDECIMAL_ONE;
+    requestRound.claimedRatio =
+      winnerGroup != null
+        ? requestRound.claimedAmount / winnerGroup.votersAmount
+        : requestRound.claimedRatio;
+    requestRound.claimedPercentage =
+      requestRound.claimedRatio * BIGDECIMAL_HUNDRED;
+  }
 
   requestRound.save();
   rewardClaimed.save();
