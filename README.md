@@ -75,7 +75,7 @@ type PriceRequest @entity {
 
 This entity tracks the data for a specific round within a PriceRequest. PriceRequest may need multiple rounds to be able to get a final price result, and for each of those rounds, a new PriceRequestRound will be created, so that the important information of each round can be tracked separately.
 
-This entity in particular will have some particular aggregated data if the round turns to be where the request is resolved, such as the tokenVoteParticipationRatio and Percentage, which will show how many voting tokens were weighted in this vote in relation to the total supply of the voting token, eligibleForRewardsRatio and Percentage, which will display the amount of voters that can claim rewards, as well as the claimedRatio and Percentage, which will display the amount of correct voters that already claimed the rewards.
+This entity in particular will have some particular aggregated data if the round turns to be where the request is resolved, such as the tokenVoteParticipationRatio and Percentage, which will show how many voting tokens were weighted in this vote in relation to the total supply of the voting token, votersEligibleForRewardsRatio and Percentage, which will display the amount of voters that can claim rewards, as well as the votersClaimedRatio and Percentage, which will display the amount of correct voters that already claimed the rewards.
 
 It will also track useful information, such as the snapshotId for this round, statistics for the winner "group", the amount of users that voted, the amount of users that claimed rewards, the amount of voting tokens weighted on this round (totalVotesRevealed) and the amount of tokens claimed as rewards.
 
@@ -98,7 +98,7 @@ type PriceRequestRound @entity {
   votersAmount: BigDecimal!
 
   "Total amount of users who claimed rewards on this round"
-  claimedAmount: BigDecimal!
+  votersClaimedAmount: BigDecimal!
 
   totalVotesRevealed: BigDecimal!
 
@@ -113,16 +113,16 @@ type PriceRequestRound @entity {
   tokenVoteParticipationPercentage: BigDecimal
 
   "Ratio of correct voters over total voters on this price request"
-  eligibleForRewardsRatio: BigDecimal
+  votersEligibleForRewardsRatio: BigDecimal
 
   "Percentage of correct voters over total voters on this price request"
-  eligibleForRewardsPercentage: BigDecimal
+  votersEligibleForRewardsPercentage: BigDecimal
 
   "Ratio of correct voters who claimed their rewards"
-  claimedRatio: BigDecimal
+  votersClaimedRatio: BigDecimal
 
   "Percentage of correct voters who claimed their rewards"
-  claimedPercentage: BigDecimal
+  votersClaimedPercentage: BigDecimal
 
   winnerGroup: VoterGroup
 

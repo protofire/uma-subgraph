@@ -34,7 +34,7 @@ export function getOrCreatePriceRequestRound(
     requestRound.totalVotesRevealed = BIGDECIMAL_ZERO;
     requestRound.totalRewardsClaimed = BIGDECIMAL_ZERO;
     requestRound.votersAmount = BIGDECIMAL_ZERO;
-    requestRound.claimedAmount = BIGDECIMAL_ZERO;
+    requestRound.votersClaimedAmount = BIGDECIMAL_ZERO;
   }
 
   return requestRound as PriceRequestRound;

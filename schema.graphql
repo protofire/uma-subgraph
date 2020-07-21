@@ -107,7 +107,7 @@ type PriceRequestRound @entity {
   votersAmount: BigDecimal!
 
   "Total amount of users who claimed rewards on this round"
-  claimedAmount: BigDecimal!
+  votersClaimedAmount: BigDecimal!
 
   totalVotesRevealed: BigDecimal!
 
@@ -122,16 +122,22 @@ type PriceRequestRound @entity {
   tokenVoteParticipationPercentage: BigDecimal
 
   "Ratio of correct voters over total voters on this price request"
-  eligibleForRewardsRatio: BigDecimal
+  votersEligibleForRewardsRatio: BigDecimal
 
   "Percentage of correct voters over total voters on this price request"
-  eligibleForRewardsPercentage: BigDecimal
+  votersEligibleForRewardsPercentage: BigDecimal
 
   "Ratio of correct voters who claimed their rewards"
-  claimedRatio: BigDecimal
+  votersClaimedRatio: BigDecimal
 
   "Percentage of correct voters who claimed their rewards"
-  claimedPercentage: BigDecimal
+  votersClaimedPercentage: BigDecimal
+
+  "Ratio of rewards claimed over total supply of voting token"
+  tokensClaimedRatio: BigDecimal
+
+  "Percentage of rewards claimed over total supply of voting token"
+  tokensClaimedPercentage: BigDecimal
 
   "gatPercentage expressed exactly as in the contract. 1 = 100%"
   gatPercentageRaw: BigDecimal
