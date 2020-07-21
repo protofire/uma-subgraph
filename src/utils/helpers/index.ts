@@ -11,7 +11,7 @@ export { getOrCreatePriceIdentifier } from "./identifierWhitelist";
 export { getOrCreateStore, getOrCreateFinalFeePair } from "./store";
 
 export {
-  getOrCreateCommitedVote,
+  getOrCreateCommittedVote,
   getOrCreatePriceRequest,
   getOrCreatePriceRequestRound,
   getOrCreateRevealedVote,

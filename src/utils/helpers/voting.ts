@@ -1,7 +1,7 @@
 import {
   PriceRequest,
   PriceRequestRound,
-  CommitedVote,
+  CommittedVote,
   RevealedVote,
   RewardsClaimed,
   VoterGroup
@@ -40,17 +40,17 @@ export function getOrCreatePriceRequestRound(
   return requestRound as PriceRequestRound;
 }
 
-export function getOrCreateCommitedVote(
+export function getOrCreateCommittedVote(
   id: String,
   createIfNotFound: boolean = true
-): CommitedVote {
-  let vote = CommitedVote.load(id);
+): CommittedVote {
+  let vote = CommittedVote.load(id);
 
   if (vote == null && createIfNotFound) {
-    vote = new CommitedVote(id);
+    vote = new CommittedVote(id);
   }
 
-  return vote as CommitedVote;
+  return vote as CommittedVote;
 }
 
 export function getOrCreateRevealedVote(

@@ -133,7 +133,7 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/index.ts
       entities:
-        - CommitedVote
+        - CommittedVote
         - RevealedVote
         - PriceRequest
         - User
@@ -316,6 +316,16 @@ templates:
           handler: handleLiquidationDisputed
         - event: DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)
           handler: handleDisputeSettled
+        - event: RequestTransferPosition(indexed address)
+          handler: handleRequestTransferPosition
+        - event: RequestTransferPositionCanceled(indexed address)
+          handler: handleRequestTransferPositionCanceled
+        - event: RequestTransferPositionExecuted(indexed address,indexed address)
+          handler: handleRequestTransferPositionExecuted
+        - event: RequestWithdrawal(indexed address,indexed uint256)
+          handler: handleRequestWithdrawal
+        - event: RequestWithdrawalCanceled(indexed address,indexed uint256)
+          handler: handleRequestWithdrawalCanceled
         - event: RequestWithdrawalExecuted(indexed address,indexed uint256)
           handler: handleRequestWithdrawalExecuted
       callHandlers:
@@ -334,11 +344,11 @@ templates:
   # + PositionCreated(indexed address,indexed uint256,indexed uint256)
   # + Redeem(indexed address,indexed uint256,indexed uint256)
   # + RegularFeesPaid(indexed uint256,indexed uint256)
-  # - RequestTransferPosition(indexed address)
-  # - RequestTransferPositionCanceled(indexed address)
-  # - RequestTransferPositionExecuted(indexed address,indexed address)
-  # - RequestWithdrawal(indexed address,indexed uint256)
-  # - RequestWithdrawalCanceled(indexed address,indexed uint256)
+  # + RequestTransferPosition(indexed address)
+  # + RequestTransferPositionCanceled(indexed address)
+  # + RequestTransferPositionExecuted(indexed address,indexed address)
+  # + RequestWithdrawal(indexed address,indexed uint256)
+  # + RequestWithdrawalCanceled(indexed address,indexed uint256)
   # + RequestWithdrawalExecuted(indexed address,indexed uint256)
   # + SettleExpiredPosition(indexed address,indexed uint256,indexed uint256)
   # + Withdrawal(indexed address,indexed uint256)

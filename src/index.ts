@@ -51,7 +51,13 @@ export {
   handleLiquidationWithdrawn,
   handleDisputeSettled,
   handleCollateralTransfer,
-  handleFeeTransfer
+  handleFeeTransfer,
+  handleRequestTransferPosition,
+  handleRequestTransferPositionCanceled,
+  handleRequestTransferPositionExecuted,
+  handleRequestWithdrawal,
+  handleRequestWithdrawalCanceled,
+  handleRequestWithdrawalExecuted
 } from "./mappings/expiringMultiParty";
 
 export { handleProposalExecuted, handleNewProposal } from "./mappings/governor";

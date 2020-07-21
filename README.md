@@ -26,7 +26,7 @@ type PriceIdentifier @entity {
 
 #### PriceRequest
 
-This entity tracks the latest state of a specific price request for a given PriceIdentifier. It will have information regarding the status of the request (whether it has been resolved or not), the price it has resolved if it did, the latest round available for the request, metadata for the resolution and more. It will also track the events related to any of the rounds within it, like votes commited, votes revealed and rewards claimed.
+This entity tracks the latest state of a specific price request for a given PriceIdentifier. It will have information regarding the status of the request (whether it has been resolved or not), the price it has resolved if it did, the latest round available for the request, metadata for the resolution and more. It will also track the events related to any of the rounds within it, like votes committed, votes revealed and rewards claimed.
 
 ```graphql
 type PriceRequest @entity {
@@ -60,8 +60,8 @@ type PriceRequest @entity {
   "List of all the rounds involved in this PriceRequest"
   rounds: [PriceRequestRound!]! @derivedFrom(field: "request")
 
-  "List of all the votes commited on this request"
-  commitedVotes: [CommitedVote!]! @derivedFrom(field: "request")
+  "List of all the votes committed on this request"
+  committedVotes: [CommittedVote!]! @derivedFrom(field: "request")
 
   "List of all the votes revealed on this request"
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "request")
@@ -126,7 +126,7 @@ type PriceRequestRound @entity {
 
   winnerGroup: VoterGroup
 
-  commitedVotes: [CommitedVote!]! @derivedFrom(field: "round")
+  committedVotes: [CommittedVote!]! @derivedFrom(field: "round")
 
   revealedVotes: [RevealedVote!]! @derivedFrom(field: "round")
 
@@ -136,7 +136,7 @@ type PriceRequestRound @entity {
 }
 ```
 
-Apart from this entities, the DVM side of the subgraph also includes entities such as `VotingTokenHolder`, that tracks the votingToken balance of users, `VoterGroup` which tracks stats for users that voted the same price on a given `PriceRequest`, and the entities that track specific events within the DVM, with raw data from the DVM events (`CommitedVote`, `RevealedVote` and `RewardsClaimed`).
+Apart from this entities, the DVM side of the subgraph also includes entities such as `VotingTokenHolder`, that tracks the votingToken balance of users, `VoterGroup` which tracks stats for users that voted the same price on a given `PriceRequest`, and the entities that track specific events within the DVM, with raw data from the DVM events (`CommittedVote`, `RevealedVote` and `RewardsClaimed`).
 
 ### FinancialContracts and Synthetic Tokens
 

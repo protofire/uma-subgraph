@@ -12,7 +12,7 @@ import {
 import { VoterGroup } from "../../generated/schema";
 import {
   getOrCreateUser,
-  getOrCreateCommitedVote,
+  getOrCreateCommittedVote,
   getOrCreatePriceRequest,
   getOrCreateRevealedVote,
   getOrCreateRewardsClaimed,
@@ -45,7 +45,7 @@ export function handleEncryptedVote(event: EncryptedVote): void {
     .concat(event.params.time.toString())
     .concat("-")
     .concat(event.params.roundId.toString());
-  let vote = getOrCreateCommitedVote(voteId);
+  let vote = getOrCreateCommittedVote(voteId);
 
   vote.encryptedVoteData = event.params.encryptedVote;
 
@@ -59,16 +59,15 @@ export function handleEncryptedVote(event: EncryptedVote): void {
 export function handlePriceRequestAdded(event: PriceRequestAdded): void {
   // Workaround needed to get the gatPercentage and inflationRate ASAP.
   let store = getOrCreateStore();
-  if (store.gatPercentage == null || store.inflationPercentage == null) {
-    let votingContract = Voting.bind(event.address);
-    let gat = votingContract.try_gatPercentage();
-    let inflation = votingContract.try_inflationRate();
+  let votingContract = Voting.bind(event.address);
+  let gat = votingContract.try_gatPercentage();
+  let inflation = votingContract.try_inflationRate();
 
-    store.gatPercentage = gat.reverted ? null : toDecimal(gat.value);
-    store.inflationPercentage = inflation.reverted
-      ? null
-      : toDecimal(inflation.value);
-  }
+  store.gatPercentage = gat.reverted ? store.gatPercentage : toDecimal(gat.value);
+  store.inflationPercentage = inflation.reverted
+    ? store.inflationPercentage
+    : toDecimal(inflation.value);
+  store.save();
 
   let requestId = event.params.identifier
     .toString()
@@ -208,7 +207,7 @@ export function handleVoteCommitted(event: VoteCommitted): void {
     .concat(event.params.time.toString())
     .concat("-")
     .concat(event.params.roundId.toString());
-  let vote = getOrCreateCommitedVote(voteId);
+  let vote = getOrCreateCommittedVote(voteId);
   let voter = getOrCreateUser(event.params.voter);
   let requestId = event.params.identifier
     .toString()

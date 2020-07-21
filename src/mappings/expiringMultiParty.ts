@@ -14,7 +14,11 @@ import {
   WithdrawLiquidationCall,
   DisputeSettled,
   RequestWithdrawalExecuted,
-  RequestTransferPositionExecuted
+  RequestWithdrawalCanceled,
+  RequestWithdrawal,
+  RequestTransferPositionExecuted,
+  RequestTransferPositionCanceled,
+  RequestTransferPosition
 } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
 import { Transfer } from "../../generated/templates/CollateralERC20/ERC20";
 import { Store } from "../../generated/Store/Store";
@@ -71,6 +75,15 @@ function updateSponsorPositionAndEMP(
   sponsorPosition.tokensOutstanding = position.reverted
     ? sponsorPosition.tokensOutstanding
     : toDecimal(position.value.value0.rawValue);
+  sponsorPosition.withdrawalRequestAmount = position.reverted
+    ? sponsorPosition.withdrawalRequestAmount
+    : toDecimal(position.value.value2.rawValue);
+  sponsorPosition.withdrawalRequestPassTimestamp = position.reverted
+    ? sponsorPosition.withdrawalRequestPassTimestamp
+    : position.value.value1;
+  sponsorPosition.transferPositionRequestPassTimestamp = position.reverted
+    ? sponsorPosition.transferPositionRequestPassTimestamp
+    : position.value.value4;
 
   sponsorPosition.save();
 }
@@ -300,6 +313,49 @@ export function handleEndedSponsorPosition(event: EndedSponsorPosition): void {
   sponsorPosition.save();
 }
 
+// - event: RequestTransferPosition(indexed address)
+//   handler: handleRequestTransferPosition
+
+export function handleRequestTransferPosition(
+  event: RequestTransferPosition
+): void {
+  updateSponsorPositionAndEMP(event.address, event.params.oldSponsor);
+}
+
+// - event: RequestTransferPositionCanceled(indexed address)
+//   handler: handleRequestTransferPositionCanceled
+
+export function handleRequestTransferPositionCanceled(
+  event: RequestTransferPositionCanceled
+): void {
+  updateSponsorPositionAndEMP(event.address, event.params.oldSponsor);
+}
+
+// - event: RequestTransferPositionExecuted(indexed address,indexed address)
+//   handler: handleRequestTransferPositionExecuted
+
+export function handleRequestTransferPositionExecuted(
+  event: RequestTransferPositionExecuted
+): void {
+  updateSponsorPositionAndEMP(event.address, event.params.oldSponsor);
+}
+
+// - event: RequestWithdrawal(indexed address,indexed uint256)
+//   handler: handleRequestWithdrawal
+
+export function handleRequestWithdrawal(event: RequestWithdrawal): void {
+  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
+}
+
+// - event: RequestWithdrawalCanceled(indexed address,indexed uint256)
+//   handler: handleRequestWithdrawalCanceled
+
+export function handleRequestWithdrawalCanceled(
+  event: RequestWithdrawalCanceled
+): void {
+  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
+}
+
 // - event: RequestWithdrawalExecuted(indexed address,indexed uint256)
 //   handler: handleRequestWithdrawalExecuted
 
@@ -313,7 +369,7 @@ export function handleRequestWithdrawalExecuted(
   positionEvent.contract = event.address.toHexString();
   positionEvent.sponsor = event.params.sponsor.toHexString();
   positionEvent.collateralAmount = event.params.collateralAmount;
-  positionEvent.wasRequested = false;
+  positionEvent.wasRequested = true;
 
   positionEvent.save();
 }
