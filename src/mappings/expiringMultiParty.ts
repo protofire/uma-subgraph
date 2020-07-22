@@ -10,6 +10,7 @@ import {
   EndedSponsorPosition,
   ExpiringMultiParty,
   LiquidationCreated,
+  LiquidationCreated1,
   LiquidationDisputed,
   WithdrawLiquidationCall,
   DisputeSettled,
@@ -382,6 +383,10 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
     .toHexString()
     .concat("-")
     .concat(event.params.liquidationId.toString());
+  let positionId = event.params.sponsor
+    .toHexString()
+    .concat("-")
+    .concat(event.address.toHexString());
   let eventId = liquidationId
     .concat("-")
     .concat(event.transaction.hash.toHexString())
@@ -412,6 +417,8 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
 
   liquidation.status = LIQUIDATION_PRE_DISPUTE;
   liquidation.sponsor = event.params.sponsor.toHexString();
+  liquidation.position = positionId;
+  liquidation.contract = event.address.toHexString();
   liquidation.liquidator = liquidator.id;
   liquidation.liquidationId = event.params.liquidationId;
   liquidation.tokensLiquidated = toDecimal(event.params.tokensOutstanding);
@@ -423,6 +430,13 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
   liquidationEvent.save();
   liquidation.save();
   emp.save();
+}
+
+// - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256,uint256)
+//   handler: handleLiquidationCreatedNew
+
+export function handleLiquidationCreatedNew(event: LiquidationCreated1): void {
+  handleLiquidationCreated(event as LiquidationCreated)
 }
 
 // - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)

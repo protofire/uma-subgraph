@@ -280,7 +280,9 @@ type FinancialContract @entity {
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
-  sponsorPositions: [SponsorPosition!]! @derivedFrom(field: "contract")
+  positions: [SponsorPosition!]! @derivedFrom(field: "contract")
+
+  liquidations: [Liquidation!]! @derivedFrom(field: "contract")
 }
 
 type Sponsor @entity {
@@ -288,6 +290,8 @@ type Sponsor @entity {
   id: ID!
 
   positions: [SponsorPosition!]! @derivedFrom(field: "sponsor")
+
+  liquidations: [Liquidation!]! @derivedFrom(field: "sponsor")
 }
 
 type SponsorPosition @entity {
@@ -299,6 +303,9 @@ type SponsorPosition @entity {
 
   "Sponsor who has the position"
   sponsor: Sponsor!
+
+  "Liquidations for this position"
+  liquidations: [Liquidation!]! @derivedFrom(field: "position")
 
   "Collateral used to back the position"
   rawCollateral: BigDecimal!
@@ -560,6 +567,12 @@ type Liquidation @entity {
 
   "Sponsor who is having its position liquidated"
   sponsor: Sponsor!
+
+  "Sponsor who is having its position liquidated"
+  position: SponsorPosition!
+
+  "Sponsor who is having its position liquidated"
+  contract: FinancialContract!
 
   "User who is liquidating the position"
   liquidator: User!

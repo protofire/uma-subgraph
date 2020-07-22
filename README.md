@@ -200,7 +200,9 @@ type FinancialContract @entity {
 
   positionManagerEvents: [PositionManagerEvent!]! @derivedFrom(field: "contract")
 
-  sponsorPositions: [SponsorPosition!]! @derivedFrom(field: "contract")
+  positions: [SponsorPosition!]! @derivedFrom(field: "contract")
+
+  liquidations: [Liquidation!]! @derivedFrom(field: "contract")
 }
 ```
 
@@ -228,7 +230,7 @@ type ContractCreator @entity {
 
 A Sponsor is a user who provides collateral currency to mint new synthetic tokens (thus, sponsoring the creation of new synthetic currency). Once a Sponsor interacts with the FinancialContract to mint new synthetic tokens, the Sponsor creates a position within the contract, we track all the information regarding that position within the scope of the SponsorPosition entity.
 
-The Sponsor entity is really simple, it's just an entity that keeps track of all the positions an address has.
+The Sponsor entity is really simple, it's just an entity that keeps track of all the positions and liquidations an address has.
 
 ```graphql
 type Sponsor @entity {
@@ -236,10 +238,12 @@ type Sponsor @entity {
   id: ID!
 
   positions: [SponsorPosition!]! @derivedFrom(field: "sponsor")
+
+  liquidations: [Liquidation!]! @derivedFrom(field: "sponsor")
 }
 ```
 
-The SponsorPosition on the other hand, has some useful information, such as the amount of collateral the position has, the amount of synthetic token outstanding, and whether or not this position has been ended.
+The SponsorPosition on the other hand, has some useful information, such as the amount of collateral the position has, the amount of synthetic token outstanding, whether or not this position has been ended, withdrawal and transfer requests info, and more.
 
 ```graphql
 type SponsorPosition @entity {
@@ -252,6 +256,9 @@ type SponsorPosition @entity {
   "Sponsor who has the position"
   sponsor: Sponsor!
 
+  "Liquidations for this position"
+  liquidations: [Liquidation!]! @derivedFrom(field: "position")
+
   "Collateral used to back the position"
   rawCollateral: BigDecimal!
 
@@ -262,6 +269,12 @@ type SponsorPosition @entity {
 
   "Depicts whether the position has been ended or not"
   isEnded: Boolean!
+
+  withdrawalRequestPassTimestamp: BigInt
+
+  withdrawalRequestAmount: BigDecimal
+
+  transferPositionRequestPassTimestamp: BigInt
 }
 ```
 
@@ -281,6 +294,12 @@ type Liquidation @entity {
 
   "Sponsor who is having its position liquidated"
   sponsor: Sponsor!
+
+  "Sponsor who is having its position liquidated"
+  position: SponsorPosition!
+
+  "Sponsor who is having its position liquidated"
+  contract: FinancialContract!
 
   "User who is liquidating the position"
   liquidator: User!

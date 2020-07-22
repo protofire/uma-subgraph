@@ -312,6 +312,8 @@ templates:
           handler: handleEndedSponsorPosition
         - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256)
           handler: handleLiquidationCreated
+        - event: LiquidationCreated(indexed address,indexed address,indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleLiquidationCreatedNew
         - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleLiquidationDisputed
         - event: DisputeSettled(indexed address,indexed address,indexed address,address,uint256,bool)

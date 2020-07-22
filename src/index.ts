@@ -47,6 +47,7 @@ export {
   handleNewSponsor,
   handleEndedSponsorPosition,
   handleLiquidationCreated,
+  handleLiquidationCreatedNew,
   handleLiquidationDisputed,
   handleLiquidationWithdrawn,
   handleDisputeSettled,
