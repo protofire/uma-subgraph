@@ -5,11 +5,11 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ protofire/uma",
-    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ protofire/uma",
-    "create-local": "graph create --node http://localhost:8020/ protofire/uma",
-    "remove-local": "graph remove --node http://localhost:8020/ protofire/uma",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 protofire/uma"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ risklabs/uma",
+    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ risklabs/uma",
+    "create-local": "graph create --node http://localhost:8020/ risklabs/uma",
+    "remove-local": "graph remove --node http://localhost:8020/ risklabs/uma",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 risklabs/uma"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.18.0",
