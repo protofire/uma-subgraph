@@ -1,16 +1,16 @@
 specVersion: 0.0.2
 description: Subgraph with support for the DVM data and synthetic tokens made with UMA, as well as supported identifiers, token holder balances and many more.
-repository: https://github.com/protofire/uma-subgraph
+repository: https://github.com/UMAprotocol/uma-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Finder
-    network: mainnet
+    network: kovan
     source:
-      address: "0x40f941e48a552bf496b154af6bf55725f18d77c3"
+      address: "0xeD0169a88d267063184b0853BaAAAe66c3c154B2"
       abi: Finder
-      startBlock: 9247083
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -28,11 +28,11 @@ dataSources:
           handler: handleFinderOwnershipTransferred
   - kind: ethereum/contract
     name: VotingToken
-    network: mainnet
+    network: kovan
     source:
-      address: "0x04fa0d235c4abf4bcf4787af4cf447de572ef828"
+      address: "0x489Bf230d4Ab5c2083556E394a28276C22c3B580"
       abi: VotingToken
-      startBlock: 9247089
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -48,11 +48,11 @@ dataSources:
           handler: handleTransferVotingToken
   - kind: ethereum/contract
     name: IdentifierWhitelist
-    network: mainnet
+    network: kovan
     source:
-      address: "0xcf649d9da4d1362c4daea67573430bd6f945e570"
+      address: "0x2Fe2C263Be8FD45971934EB2421Fc59761dda343"
       abi: IdentifierWhitelist
-      startBlock: 9937679
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -70,11 +70,11 @@ dataSources:
           handler: handleSupportedIdentifierRemoved
   - kind: ethereum/contract
     name: Store
-    network: mainnet
+    network: kovan
     source:
-      address: "0x54f44ea3d2e7aa0ac089c4d8f7c93c27844057bf"
+      address: "0x41AF40Eb92Bec4dD8DA77103597838b3dBBD3B6f"
       abi: Store
-      startBlock: 9937562
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -97,11 +97,11 @@ dataSources:
           handler: handleSetFinalFee
   - kind: ethereum/contract
     name: AddressWhitelist
-    network: mainnet
+    network: kovan
     source:
-      address: "0x48e687205d3962c43891b8cde5a4fe75fa6c8d7a"
+      address: "0xf8bdAb5d675F76eD863fF9Fa35B129A6e43e71cA"
       abi: AddressWhitelist
-      startBlock: 9937562
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -122,11 +122,11 @@ dataSources:
           handler: handleRemovedFromWhitelist
   - kind: ethereum/contract
     name: Voting
-    network: mainnet
+    network: kovan
     source:
-      address: "0x9921810c710e7c3f7a7c6831e30929f19537a545"
+      address: "0x24BE89E098d6F65A924142d93013A84281F6296B"
       abi: Voting
-      startBlock: 9937588
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -164,11 +164,11 @@ dataSources:
           handler: handleSetInflationRate
   - kind: ethereum/contract
     name: Registry
-    network: mainnet
+    network: kovan
     source:
-      address: "0x3e532e6222afe9bcf02dcb87216802c75d5113ae"
+      address: "0x7b1c04D2826B140779e2B97d5783AF05cf00Fbab"
       abi: Registry
-      startBlock: 9937650
+      startBlock: 	20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -192,7 +192,7 @@ dataSources:
           handler: handleRemovedSharedMember
   # - kind: ethereum/contract
   #   name: Governor
-  #   network: mainnet
+  #   network: kovan
   #   source:
   #     address: "0x592349f7dedb2b75f9d4f194d4b7c16d82e507dc"
   #     abi: Governor
@@ -216,7 +216,7 @@ dataSources:
 templates:
   - name: CollateralERC20
     kind: ethereum/contract
-    network: mainnet
+    network: kovan
     source:
       abi: ERC20
     mapping:
@@ -234,7 +234,7 @@ templates:
           handler: handleCollateralTransfer
   - name: FeeERC20
     kind: ethereum/contract
-    network: mainnet
+    network: kovan
     source:
       abi: ERC20
     mapping:
@@ -254,7 +254,7 @@ templates:
           handler: handleFeeTransfer
   - name: ExpiringMultiPartyCreator
     kind: ethereum/contract
-    network: mainnet
+    network: kovan
     source:
       abi: ExpiringMultiPartyCreator
     mapping:
@@ -277,7 +277,7 @@ templates:
           handler: handleCreatedExpiringMultiParty
   - name: ExpiringMultiParty
     kind: ethereum/contract
-    network: mainnet
+    network: kovan
     source:
       abi: ExpiringMultiParty
     mapping:
