@@ -2,9 +2,9 @@ import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
 import { toDecimal } from "./decimals";
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const STORE_ID = "0x54f44ea3d2e7aa0ac089c4d8f7c93c27844057bf";
-export const GOVERNOR_ADDRESS_STRING = "0x592349f7dedb2b75f9d4f194d4b7c16d82e507dc";
-export let VOTING_TOKEN_ADDRESS = Address.fromString("0x04fa0d235c4abf4bcf4787af4cf447de572ef828");
+export const STORE_ID = "0x41AF40Eb92Bec4dD8DA77103597838b3dBBD3B6f";
+export const GOVERNOR_ADDRESS_STRING = "0xca4575EE197308c9D2aBF813A5f064f44898b7a4";
+export let VOTING_TOKEN_ADDRESS = Address.fromString("0x489Bf230d4Ab5c2083556E394a28276C22c3B580");
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
