@@ -26,6 +26,7 @@ import { Store } from "../../generated/Store/Store";
 import {
   getOrCreateStore,
   getOrCreateUser,
+  getOrCreateToken,
   getOrCreateFinancialContract,
   getOrCreateRegularFeePaidEvent,
   getOrCreateFinalFeePaidEvent,
@@ -66,19 +67,21 @@ function updateSponsorPositionAndEMP(
   let empContract = ExpiringMultiParty.bind(empAddress);
   let position = empContract.try_positions(sponsorAddress);
   let collateral = empContract.try_getCollateral(sponsorAddress);
+  let syntheticToken = getOrCreateToken(Address.fromString(sponsorPosition.syntheticToken));
+  let collateralToken = getOrCreateToken(Address.fromString(sponsorPosition.collateralToken));
 
   sponsorPosition.rawCollateral = position.reverted
     ? sponsorPosition.rawCollateral
-    : toDecimal(position.value.value3.rawValue);
+    : toDecimal(position.value.value3.rawValue, collateralToken.decimals);
   sponsorPosition.collateral = collateral.reverted
     ? sponsorPosition.collateral
-    : toDecimal(collateral.value.rawValue);
+    : toDecimal(collateral.value.rawValue, collateralToken.decimals);
   sponsorPosition.tokensOutstanding = position.reverted
     ? sponsorPosition.tokensOutstanding
-    : toDecimal(position.value.value0.rawValue);
+    : toDecimal(position.value.value0.rawValue, syntheticToken.decimals);
   sponsorPosition.withdrawalRequestAmount = position.reverted
     ? sponsorPosition.withdrawalRequestAmount
-    : toDecimal(position.value.value2.rawValue);
+    : toDecimal(position.value.value2.rawValue, collateralToken.decimals);
   sponsorPosition.withdrawalRequestPassTimestamp = position.reverted
     ? sponsorPosition.withdrawalRequestPassTimestamp
     : position.value.value1;
@@ -97,19 +100,21 @@ function updateEMP(empAddress: Address): void {
   let rawCollateral = empContract.try_rawTotalPositionCollateral();
   let rawLiquidation = empContract.try_rawLiquidationCollateral();
   let collateral = empContract.try_totalPositionCollateral();
+  let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
+  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
 
   emp.totalTokensOutstanding = outstanding.reverted
     ? emp.totalTokensOutstanding
-    : toDecimal(outstanding.value);
+    : toDecimal(outstanding.value, syntheticToken.decimals);
   emp.rawTotalPositionCollateral = rawCollateral.reverted
     ? emp.rawTotalPositionCollateral
-    : toDecimal(rawCollateral.value);
+    : toDecimal(rawCollateral.value, collateralToken.decimals);
   emp.rawLiquidationCollateral = rawLiquidation.reverted
     ? emp.rawLiquidationCollateral
-    : toDecimal(rawLiquidation.value);
+    : toDecimal(rawLiquidation.value, collateralToken.decimals);
   emp.totalPositionCollateral = collateral.reverted
     ? emp.totalPositionCollateral
-    : toDecimal(collateral.value.rawValue);
+    : toDecimal(collateral.value.rawValue, collateralToken.decimals);
   emp.cumulativeFeeMultiplier = feeMultiplier.reverted
     ? emp.cumulativeFeeMultiplier
     : toDecimal(feeMultiplier.value);
@@ -180,9 +185,11 @@ export function handlePositionCreated(event: PositionCreated): void {
 
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreatePositionCreatedEvent(event);
+  let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
 
   emp.totalSyntheticTokensCreated =
-    emp.totalSyntheticTokensCreated + toDecimal(event.params.tokenAmount);
+    emp.totalSyntheticTokensCreated +
+    toDecimal(event.params.tokenAmount, syntheticToken.decimals);
 
   positionEvent.contract = event.address.toHexString();
   positionEvent.sponsor = event.params.sponsor.toHexString();
@@ -208,9 +215,11 @@ export function handleSettleExpiredPosition(
 
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateSettleExpiredPositionEvent(event);
+  let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
 
   emp.totalSyntheticTokensBurned =
-    emp.totalSyntheticTokensBurned + toDecimal(event.params.tokensBurned);
+    emp.totalSyntheticTokensBurned +
+    toDecimal(event.params.tokensBurned, syntheticToken.decimals);
 
   positionEvent.contract = event.address.toHexString();
   positionEvent.caller = event.params.caller;
@@ -230,9 +239,11 @@ export function handleRedeem(event: Redeem): void {
 
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let positionEvent = getOrCreateRedeemEvent(event);
+  let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
 
   emp.totalSyntheticTokensBurned =
-    emp.totalSyntheticTokensBurned + toDecimal(event.params.tokenAmount);
+    emp.totalSyntheticTokensBurned +
+    toDecimal(event.params.tokenAmount, syntheticToken.decimals);
 
   positionEvent.contract = event.address.toHexString();
   positionEvent.sponsor = event.params.sponsor.toHexString();
@@ -290,6 +301,8 @@ export function handleNewSponsor(event: NewSponsor): void {
 
   sponsorPosition.sponsor = sponsor.id;
   sponsorPosition.contract = event.address.toHexString();
+  sponsorPosition.collateralToken = emp.collateralToken;
+  sponsorPosition.syntheticToken = emp.syntheticToken;
 
   sponsor.save();
   sponsorPosition.save();
@@ -399,9 +412,12 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
   updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 
   let emp = getOrCreateFinancialContract(event.address.toHexString());
+  let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
+  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
 
   emp.totalSyntheticTokensBurned =
-    emp.totalSyntheticTokensBurned + toDecimal(event.params.tokensOutstanding);
+    emp.totalSyntheticTokensBurned +
+    toDecimal(event.params.tokensOutstanding, syntheticToken.decimals);
 
   liquidationEvent.tx_hash = event.transaction.hash.toHexString();
   liquidationEvent.block = event.block.number;
@@ -421,10 +437,17 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
   liquidation.contract = event.address.toHexString();
   liquidation.liquidator = liquidator.id;
   liquidation.liquidationId = event.params.liquidationId;
-  liquidation.tokensLiquidated = toDecimal(event.params.tokensOutstanding);
-  liquidation.lockedCollateral = toDecimal(event.params.lockedCollateral);
+  liquidation.tokensLiquidated = toDecimal(
+    event.params.tokensOutstanding,
+    syntheticToken.decimals
+  );
+  liquidation.lockedCollateral = toDecimal(
+    event.params.lockedCollateral,
+    collateralToken.decimals
+  );
   liquidation.liquidatedCollateral = toDecimal(
-    event.params.liquidatedCollateral
+    event.params.liquidatedCollateral,
+    collateralToken.decimals
   );
 
   liquidationEvent.save();
@@ -436,7 +459,7 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
 //   handler: handleLiquidationCreatedNew
 
 export function handleLiquidationCreatedNew(event: LiquidationCreated1): void {
-  handleLiquidationCreated(event as LiquidationCreated)
+  handleLiquidationCreated(event as LiquidationCreated);
 }
 
 // - event: LiquidationDisputed(indexed address,indexed address,indexed address,uint256,uint256)
@@ -492,6 +515,8 @@ export function handleLiquidationWithdrawn(
     .concat(call.transaction.hash.toHexString());
   let liquidationEvent = getOrCreateLiquidationWithdrawnEvent(eventId);
   let liquidation = getOrCreateLiquidation(liquidationId);
+  let emp = getOrCreateFinancialContract(call.to.toHexString());
+  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
 
   updateSponsorPositionAndEMP(call.to, call.inputs.sponsor);
 
@@ -502,7 +527,10 @@ export function handleLiquidationWithdrawn(
   liquidationEvent.amountWithdrawn = call.outputs.amountWithdrawn.rawValue;
   liquidationEvent.sponsor = call.inputs.sponsor;
 
-  liquidation.amountWithdrawn = toDecimal(liquidationEvent.amountWithdrawn);
+  liquidation.amountWithdrawn = toDecimal(
+    liquidationEvent.amountWithdrawn,
+    collateralToken.decimals
+  );
 
   liquidationEvent.save();
   liquidation.save();
@@ -551,6 +579,7 @@ export function handleDisputeSettled(event: DisputeSettled): void {
 //   handler: handleCollateralTransfer
 
 export function handleCollateralTransfer(event: Transfer): void {
+  let token = getOrCreateToken(event.address);
   let fromContract = getOrCreateFinancialContract(
     event.params.from.toHexString(),
     false
@@ -565,7 +594,8 @@ export function handleCollateralTransfer(event: Transfer): void {
     event.address.toHexString() == fromContract.collateralToken
   ) {
     fromContract.totalCollateralWithdrawn =
-      fromContract.totalCollateralWithdrawn + toDecimal(event.params.value);
+      fromContract.totalCollateralWithdrawn +
+      toDecimal(event.params.value, token.decimals);
     fromContract.save();
   }
 
@@ -574,7 +604,8 @@ export function handleCollateralTransfer(event: Transfer): void {
     event.address.toHexString() == toContract.collateralToken
   ) {
     toContract.totalCollateralDeposited =
-      toContract.totalCollateralDeposited + toDecimal(event.params.value);
+      toContract.totalCollateralDeposited +
+      toDecimal(event.params.value, token.decimals);
     toContract.save();
   }
 }

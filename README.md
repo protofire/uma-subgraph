@@ -256,6 +256,12 @@ type SponsorPosition @entity {
   "Sponsor who has the position"
   sponsor: Sponsor!
 
+  "Token used as collateral"
+  collateralToken: Token
+
+  "Synthetic token"
+  syntheticToken: Token
+
   "Liquidations for this position"
   liquidations: [Liquidation!]! @derivedFrom(field: "position")
 
