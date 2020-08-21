@@ -67,8 +67,12 @@ function updateSponsorPositionAndEMP(
   let empContract = ExpiringMultiParty.bind(empAddress);
   let position = empContract.try_positions(sponsorAddress);
   let collateral = empContract.try_getCollateral(sponsorAddress);
-  let syntheticToken = getOrCreateToken(Address.fromString(sponsorPosition.syntheticToken));
-  let collateralToken = getOrCreateToken(Address.fromString(sponsorPosition.collateralToken));
+  let syntheticToken = getOrCreateToken(
+    Address.fromString(sponsorPosition.syntheticToken)
+  );
+  let collateralToken = getOrCreateToken(
+    Address.fromString(sponsorPosition.collateralToken)
+  );
 
   sponsorPosition.rawCollateral = position.reverted
     ? sponsorPosition.rawCollateral
@@ -101,7 +105,9 @@ function updateEMP(empAddress: Address): void {
   let rawLiquidation = empContract.try_rawLiquidationCollateral();
   let collateral = empContract.try_totalPositionCollateral();
   let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
-  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
+  let collateralToken = getOrCreateToken(
+    Address.fromString(emp.collateralToken)
+  );
 
   emp.totalTokensOutstanding = outstanding.reverted
     ? emp.totalTokensOutstanding
@@ -392,14 +398,13 @@ export function handleRequestWithdrawalExecuted(
 //   handler: handleLiquidationCreated
 
 export function handleLiquidationCreated(event: LiquidationCreated): void {
-  let liquidationId = event.params.sponsor
-    .toHexString()
-    .concat("-")
-    .concat(event.params.liquidationId.toString());
   let positionId = event.params.sponsor
     .toHexString()
     .concat("-")
     .concat(event.address.toHexString());
+  let liquidationId = positionId
+    .concat("-")
+    .concat(event.params.liquidationId.toString());
   let eventId = liquidationId
     .concat("-")
     .concat(event.transaction.hash.toHexString())
@@ -413,7 +418,9 @@ export function handleLiquidationCreated(event: LiquidationCreated): void {
 
   let emp = getOrCreateFinancialContract(event.address.toHexString());
   let syntheticToken = getOrCreateToken(Address.fromString(emp.syntheticToken));
-  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
+  let collateralToken = getOrCreateToken(
+    Address.fromString(emp.collateralToken)
+  );
 
   emp.totalSyntheticTokensBurned =
     emp.totalSyntheticTokensBurned +
@@ -469,6 +476,8 @@ export function handleLiquidationDisputed(event: LiquidationDisputed): void {
   let liquidationId = event.params.sponsor
     .toHexString()
     .concat("-")
+    .concat(event.address.toHexString())
+    .concat("-")
     .concat(event.params.liquidationId.toString());
   let eventId = liquidationId
     .concat("-")
@@ -509,6 +518,8 @@ export function handleLiquidationWithdrawn(
   let liquidationId = call.inputs.sponsor
     .toHexString()
     .concat("-")
+    .concat(call.to.toHexString())
+    .concat("-")
     .concat(call.inputs.liquidationId.toString());
   let eventId = liquidationId
     .concat("-")
@@ -516,7 +527,9 @@ export function handleLiquidationWithdrawn(
   let liquidationEvent = getOrCreateLiquidationWithdrawnEvent(eventId);
   let liquidation = getOrCreateLiquidation(liquidationId);
   let emp = getOrCreateFinancialContract(call.to.toHexString());
-  let collateralToken = getOrCreateToken(Address.fromString(emp.collateralToken));
+  let collateralToken = getOrCreateToken(
+    Address.fromString(emp.collateralToken)
+  );
 
   updateSponsorPositionAndEMP(call.to, call.inputs.sponsor);
 
@@ -542,6 +555,8 @@ export function handleLiquidationWithdrawn(
 export function handleDisputeSettled(event: DisputeSettled): void {
   let liquidationId = event.params.sponsor
     .toHexString()
+    .concat("-")
+    .concat(event.address.toHexString())
     .concat("-")
     .concat(event.params.liquidationId.toString());
   let eventId = liquidationId
