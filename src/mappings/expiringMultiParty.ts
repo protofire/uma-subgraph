@@ -320,13 +320,13 @@ export function handleNewSponsor(event: NewSponsor): void {
 //   handler: handleEndedSponsorPosition
 
 export function handleEndedSponsorPosition(event: EndedSponsorPosition): void {
+  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
+
   let positionId = event.params.sponsor
     .toHexString()
     .concat("-")
     .concat(event.address.toHexString());
   let sponsorPosition = getOrCreateSponsorPosition(positionId);
-
-  updateSponsorPositionAndEMP(event.address, event.params.sponsor);
 
   sponsorPosition.isEnded = true;
 
