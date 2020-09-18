@@ -309,6 +309,7 @@ export function handleNewSponsor(event: NewSponsor): void {
   sponsorPosition.contract = event.address.toHexString();
   sponsorPosition.collateralToken = emp.collateralToken;
   sponsorPosition.syntheticToken = emp.syntheticToken;
+  sponsorPosition.isEnded = false;
 
   sponsor.save();
   sponsorPosition.save();
