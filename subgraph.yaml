@@ -167,8 +167,8 @@ dataSources:
     network: kovan
     source:
       address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
-      abi: NewVoting
-      startBlock: 20185622
+      abi: Voting
+      startBlock: 20981024
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -182,8 +182,8 @@ dataSources:
         - PriceIdentifier
         - Store
       abis:
-        - name: NewVoting
-          file: ./abis/NewVoting.json
+        - name: Voting
+          file: ./abis/Voting.json
         - name: VotingToken
           file: ./abis/VotingToken.json
       eventHandlers:
