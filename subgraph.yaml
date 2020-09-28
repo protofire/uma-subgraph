@@ -164,7 +164,7 @@ dataSources:
           handler: handleSetInflationRate
   - kind: ethereum/contract
     name: NewVoting
-    network: mainnet
+    network: kovan
     source:
       address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
       abi: NewVoting
