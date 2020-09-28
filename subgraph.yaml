@@ -167,7 +167,7 @@ dataSources:
     network: mainnet
     source:
       address: "0x1d847fb6e04437151736a53f09b6e49713a52aad"
-      abi: NewVoting
+      abi: Voting
       startBlock: 10893080
     mapping:
       kind: ethereum/events
@@ -182,8 +182,8 @@ dataSources:
         - PriceIdentifier
         - Store
       abis:
-        - name: NewVoting
-          file: ./abis/NewVoting.json
+        - name: Voting
+          file: ./abis/Voting.json
         - name: VotingToken
           file: ./abis/VotingToken.json
       eventHandlers:
