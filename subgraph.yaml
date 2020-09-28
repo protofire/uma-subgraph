@@ -124,7 +124,7 @@ dataSources:
     name: Voting
     network: kovan
     source:
-      address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
+      address: "0x10E241725178991417E65fadE965Ca1F07852283"
       abi: Voting
       startBlock: 20185622
     mapping:
@@ -166,9 +166,9 @@ dataSources:
     name: NewVoting
     network: mainnet
     source:
-      address: "0x1d847fb6e04437151736a53f09b6e49713a52aad"
+      address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
       abi: NewVoting
-      startBlock: 10893080
+      startBlock: 20185622
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
