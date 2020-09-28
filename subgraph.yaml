@@ -124,9 +124,51 @@ dataSources:
     name: Voting
     network: kovan
     source:
-      address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
+      address: "0x10E241725178991417E65fadE965Ca1F07852283"
       abi: Voting
       startBlock: 20185622
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - CommittedVote
+        - RevealedVote
+        - PriceRequest
+        - User
+        - PriceIdentifier
+        - Store
+      abis:
+        - name: Voting
+          file: ./abis/Voting.json
+        - name: VotingToken
+          file: ./abis/VotingToken.json
+      eventHandlers:
+        - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
+          handler: handleEncryptedVote
+        - event: PriceRequestAdded(indexed uint256,indexed bytes32,uint256)
+          handler: handlePriceRequestAdded
+        - event: PriceResolved(indexed uint256,indexed bytes32,uint256,int256)
+          handler: handlePriceResolved
+        - event: RewardsRetrieved(indexed address,indexed uint256,indexed bytes32,uint256,uint256)
+          handler: handleRewardsRetrieved
+        - event: VoteCommitted(indexed address,indexed uint256,indexed bytes32,uint256)
+          handler: handleVoteCommitted
+        - event: VoteRevealed(indexed address,indexed uint256,indexed bytes32,uint256,int256,uint256)
+          handler: handleVoteRevealed
+      callHandlers:
+        - function: setGatPercentage(tuple)
+          handler: handleSetGatPercentage
+        - function: setInflationRate(tuple)
+          handler: handleSetInflationRate
+  - kind: ethereum/contract
+    name: NewVoting
+    network: kovan
+    source:
+      address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
+      abi: Voting
+      startBlock: 20981024
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
