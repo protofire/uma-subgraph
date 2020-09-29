@@ -5,7 +5,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ umaprotocol/uma-kovan2",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ umaprotocol/uma-kovan",
     "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ umaprotocol/uma-kovan2",
     "create-local": "graph create --node http://localhost:8020/ umaprotocol/uma-kovan",
     "remove-local": "graph remove --node http://localhost:8020/ umaprotocol/uma-kovan",
