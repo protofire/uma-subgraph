@@ -31,10 +31,6 @@ import { log } from "@graphprotocol/graph-ts";
 //   handler: handleSetFinalFee
 
 export function handleSetFinalFee(call: SetFinalFeeCall): void {
-  log.warning("setFinalFee called at block: {} tx_hash: {}", [
-    call.block.number.toString(),
-    call.transaction.hash.toHexString()
-  ]);
   let store = getOrCreateStore();
   let currency = getOrCreateToken(call.inputs.currency);
   let finalFeePair = getOrCreateFinalFeePair(currency.id);

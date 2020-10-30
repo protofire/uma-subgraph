@@ -61,4 +61,4 @@ export {
   handleRequestWithdrawalExecuted
 } from "./mappings/expiringMultiParty";
 
-// export { handleProposalExecuted, handleNewProposal } from "./mappings/governor";
+export { handleProposalExecuted, handleNewProposal } from "./mappings/governor";
