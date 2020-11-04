@@ -14,7 +14,9 @@ import { ADMIN_PROPOSAL_PREFIX } from "../utils/constants";
 export function handleNewProposal(event: NewProposal): void {
   let proposal = getOrCreateProposal(event.params.id.toString());
 
-  proposal.request = ADMIN_PROPOSAL_PREFIX.concat(proposal.id);
+  proposal.request = ADMIN_PROPOSAL_PREFIX.concat(proposal.id)
+    .concat("-")
+    .concat(event.block.timestamp.toString());
   proposal.transactionAmount = event.params.transactions.length;
   proposal.save();
 
