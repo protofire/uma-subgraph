@@ -15,3 +15,8 @@ export const LIQUIDATION_PENDING_DISPUTE = "PendingDispute"
 export const LIQUIDATION_DISPUTE_SUCCEEDED = "DisputeSucceeded"
 export const LIQUIDATION_DISPUTE_FAILED = "DisputeFailed"
 export const ADMIN_PROPOSAL_PREFIX = "Admin "
+// List of contract creators that we want to ignore because they do not conform to the
+// FinancialContract Schema. Temporary fix until we develop more robust way to handle
+// multiple types of FinancialContracts.
+export let BLACKLISTED_CREATORS = new Array<String>();
+BLACKLISTED_CREATORS.push("0x1d17adfe4ed05411e590646c378c777068250358")
