@@ -20,3 +20,4 @@ export const ADMIN_PROPOSAL_PREFIX = "Admin "
 // multiple types of FinancialContracts.
 export let BLACKLISTED_CREATORS = new Array<String>();
 BLACKLISTED_CREATORS.push("0x1d17adfe4ed05411e590646c378c777068250358")
+BLACKLISTED_CREATORS.push("0x211aab73c56fef9314fb0889e4f045b5f27cdb3f")
