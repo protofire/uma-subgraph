@@ -1,12 +1,12 @@
 {
-  "name": "uma-subgraph-mainnet",
+  "name": "uma-sugraph",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ umaprotocol/uma",
-    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ umaprotocol/uma",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ protofire/uma",
+    "deploy-dev": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ protofire/uma",
     "create-local": "graph create --node http://localhost:8020/ protofire/uma",
     "remove-local": "graph remove --node http://localhost:8020/ protofire/uma",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 protofire/uma"
