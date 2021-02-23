@@ -19,4 +19,7 @@ export const ADMIN_PROPOSAL_PREFIX = "Admin "
 // FinancialContract Schema. Temporary fix until we develop more robust way to handle
 // multiple types of FinancialContracts.
 export let BLACKLISTED_CREATORS = new Array<String>();
+// Jarvis perpetual creator
 BLACKLISTED_CREATORS.push("0x98c1f29a478fb4e5da14c2bca0380e67ac2a964a")
+// UMA perpetual creator
+BLACKLISTED_CREATORS.push("0xe9f67235c1b0ee401e5f5e119fb9dfc9753f10f9")
