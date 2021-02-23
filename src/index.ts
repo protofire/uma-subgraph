@@ -17,6 +17,18 @@ export {
 } from "./mappings/voting";
 
 export {
+  handleEncryptedVote as handleEncryptedVoteAncillary,
+  handleVoteRevealed as handleVoteRevealedAncillary,
+  handleVoteCommitted as handleVoteCommittedAncillary,
+  handlePriceRequestAdded as handlePriceRequestAddedAncillary,
+  handlePriceResolved as handlePriceResolvedAncillary,
+  handleRewardsRetrieved as handleRewardsRetrievedAncillary,
+  handleSetGatPercentage as handleSetGatPercentageAncillary,
+  handleSetInflationRate as handleSetInflationRateAncillary
+} from "./mappings/votingAncillary";
+
+
+export {
   handleSupportedIdentifierAdded,
   handleSupportedIdentifierRemoved
 } from "./mappings/identifierWhitelist";
