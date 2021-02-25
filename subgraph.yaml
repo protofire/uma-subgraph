@@ -163,7 +163,7 @@ dataSources:
         - function: setInflationRate(tuple)
           handler: handleSetInflationRate
   - kind: ethereum/contract
-    name: NewVoting
+    name: Voting2
     network: kovan
     source:
       address: "0x03fe668862a0BFa9d3706A0ebA18007464343FdD"
@@ -211,6 +211,48 @@ dataSources:
       address: "0x08f5728338de40a7b6fc35d30b0ca7cc622be6f3"
       abi: VotingAncillary
       startBlock: 23214682 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - CommittedVote
+        - RevealedVote
+        - PriceRequest
+        - User
+        - PriceIdentifier
+        - Store
+      abis:
+        - name: VotingAncillary
+          file: ./abis/VotingAncillary.json
+        - name: VotingToken
+          file: ./abis/VotingToken.json
+      eventHandlers:
+        - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes,bytes)
+          handler: handleEncryptedVoteAncillary
+        - event: PriceRequestAdded(indexed uint256,indexed bytes32,uint256)
+          handler: handlePriceRequestAddedAncillary
+        - event: PriceResolved(indexed uint256,indexed bytes32,uint256,int256,bytes)
+          handler: handlePriceResolvedAncillary
+        - event: RewardsRetrieved(indexed address,indexed uint256,indexed bytes32,uint256,bytes,uint256)
+          handler: handleRewardsRetrievedAncillary
+        - event: VoteCommitted(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
+          handler: handleVoteCommittedAncillary
+        - event: VoteRevealed(indexed address,indexed uint256,indexed bytes32,uint256,int256,bytes,uint256)
+          handler: handleVoteRevealedAncillary
+      callHandlers:
+        - function: setGatPercentage(tuple)
+          handler: handleSetGatPercentageAncillary
+        - function: setInflationRate(tuple)
+          handler: handleSetInflationRateAncillary
+  - kind: ethereum/contract
+    name: VotingAncillary2
+    network: kovan
+    source:
+      address: "0x0740C93a3D2B6088d0E345Da47c3B412b9874562"
+      abi: VotingAncillary
+      startBlock: 23649096 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
