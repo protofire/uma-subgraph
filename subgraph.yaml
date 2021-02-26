@@ -250,9 +250,9 @@ dataSources:
     name: VotingAncillary2
     network: kovan
     source:
-      address: "0x0740C93a3D2B6088d0E345Da47c3B412b9874562"
+      address: "0x0740c93a3d2b6088d0e345da47c3b412b9874562"
       abi: VotingAncillary
-      startBlock: 23649096 
+      startBlock: 23650227 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

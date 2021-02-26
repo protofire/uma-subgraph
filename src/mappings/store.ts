@@ -76,7 +76,7 @@ export function handleNewWeeklyDelayFeePerSecondPerPfc(
   store.save();
 }
 
-// - event: AddedToWhitelist(indexed address)
+// - event: AddedToWhitelist(indexed addedAddress)
 //   handler: handleAddedToWhitelist
 
 export function handleAddedToWhitelist(event: AddedToWhitelist): void {
@@ -87,7 +87,7 @@ export function handleAddedToWhitelist(event: AddedToWhitelist): void {
   token.save();
 }
 
-// - event: RemovedFromWhitelist(indexed address)
+// - event: RemovedFromWhitelist(indexed removedAddress)
 //   handler: handleRemovedFromWhitelist
 
 export function handleRemovedFromWhitelist(event: RemovedFromWhitelist): void {
