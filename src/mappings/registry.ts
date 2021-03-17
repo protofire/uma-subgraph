@@ -13,7 +13,7 @@ import {
   getOrCreateToken,
   calculateGCR
 } from "../utils/helpers";
-import { BIGINT_ONE, GOVERNOR_ADDRESS_STRING } from "../utils/constants";
+import { BIGINT_ONE, GOVERNOR_ADDRESS_STRING, BLACKLISTED_CREATORS } from "../utils/constants";
 import { toDecimal } from "../utils/decimals";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
@@ -22,7 +22,10 @@ import { toDecimal } from "../utils/decimals";
 export function handleNewContractRegistered(
   event: NewContractRegistered
 ): void {
-  if (event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
+  if (
+    event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING &&
+    !BLACKLISTED_CREATORS.includes(event.params.creator.toHexString())
+  ) {    
     let contract = getOrCreateFinancialContract(
       event.params.contractAddress.toHexString()
     );

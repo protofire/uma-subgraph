@@ -101,9 +101,9 @@ dataSources:
     name: AddressWhitelist
     network: mainnet
     source:
-      address: "0x48e687205d3962c43891b8cde5a4fe75fa6c8d7a"
+      address: "0xdbf90434df0b98219f87d112f37d74b1d90758c7"
       abi: AddressWhitelist
-      startBlock: 9937562
+      startBlock: 10484890
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -206,6 +206,48 @@ dataSources:
           handler: handleSetGatPercentage
         - function: setInflationRate((uint256))
           handler: handleSetInflationRate
+  - kind: ethereum/contract
+    name: VotingAncillary
+    network: mainnet
+    source:
+      address: "0x8b1631ab830d11531ae83725fda4d86012eccd77"
+      abi: VotingAncillary
+      startBlock: 11876839 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - CommittedVote
+        - RevealedVote
+        - PriceRequest
+        - User
+        - PriceIdentifier
+        - Store
+      abis:
+        - name: VotingAncillary
+          file: ./abis/VotingAncillary.json
+        - name: VotingToken
+          file: ./abis/VotingToken.json
+      eventHandlers:
+        - event: EncryptedVote(indexed address,indexed uint256,indexed bytes32,uint256,bytes,bytes)
+          handler: handleEncryptedVoteAncillary
+        - event: PriceRequestAdded(indexed uint256,indexed bytes32,uint256)
+          handler: handlePriceRequestAddedAncillary
+        - event: PriceResolved(indexed uint256,indexed bytes32,uint256,int256,bytes)
+          handler: handlePriceResolvedAncillary
+        - event: RewardsRetrieved(indexed address,indexed uint256,indexed bytes32,uint256,bytes,uint256)
+          handler: handleRewardsRetrievedAncillary
+        - event: VoteCommitted(indexed address,indexed uint256,indexed bytes32,uint256,bytes)
+          handler: handleVoteCommittedAncillary
+        - event: VoteRevealed(indexed address,indexed uint256,indexed bytes32,uint256,int256,bytes,uint256)
+          handler: handleVoteRevealedAncillary
+      callHandlers:
+        - function: setGatPercentage((uint256))
+          handler: handleSetGatPercentageAncillary
+        - function: setInflationRate((uint256))
+          handler: handleSetInflationRateAncillary
   - kind: ethereum/contract
     name: Registry
     network: mainnet
