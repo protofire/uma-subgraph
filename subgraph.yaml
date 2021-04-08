@@ -212,7 +212,7 @@ dataSources:
     source:
       address: "0x8b1631ab830d11531ae83725fda4d86012eccd77"
       abi: VotingAncillary
-      startBlock: 11876839 
+      startBlock: 11876839
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -267,8 +267,8 @@ dataSources:
       abis:
         - name: Registry
           file: ./abis/Registry.json
-        - name: ExpiringMultiPartyCreator
-          file: ./abis/ExpiringMultiPartyCreator.json
+        - name: GenericContractCreator
+          file: ./abis/GenericContractCreator.json
       eventHandlers:
         - event: NewContractRegistered(indexed address,indexed address,address[])
           handler: handleNewContractRegistered
@@ -338,11 +338,11 @@ templates:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleFeeTransfer
-  - name: ExpiringMultiPartyCreator
+  - name: GenericContractCreator
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: ExpiringMultiPartyCreator
+      abi: GenericContractCreator
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -352,20 +352,22 @@ templates:
         - ContractCreator
         - FinancialContract
       abis:
-        - name: ExpiringMultiPartyCreator
-          file: ./abis/ExpiringMultiPartyCreator.json
-        - name: ExpiringMultiParty
-          file: ./abis/ExpiringMultiParty.json
+        - name: GenericContractCreator
+          file: ./abis/GenericContractCreator.json
+        - name: GenericFinancialContract
+          file: ./abis/GenericFinancialContract.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
         - event: CreatedExpiringMultiParty(indexed address,indexed address)
           handler: handleCreatedExpiringMultiParty
-  - name: ExpiringMultiParty
+        - event: CreatedPerpetual(indexed address,indexed address)
+          handler: handleCreatedPerpetual
+  - name: GenericFinancialContract
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: ExpiringMultiParty
+      abi: GenericFinancialContract
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -375,8 +377,8 @@ templates:
         - FinancialContract
         - Store
       abis:
-        - name: ExpiringMultiParty
-          file: ./abis/ExpiringMultiParty.json
+        - name: GenericFinancialContract
+          file: ./abis/GenericFinancialContract.json
       eventHandlers:
         - event: FinalFeesPaid(indexed uint256)
           handler: handleFinalFeesPaid

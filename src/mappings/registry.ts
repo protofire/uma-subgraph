@@ -3,8 +3,11 @@ import {
   AddedSharedMember,
   RemovedSharedMember
 } from "../../generated/Registry/Registry";
-import { CreatedExpiringMultiParty } from "../../generated/templates/ExpiringMultiPartyCreator/ExpiringMultiPartyCreator";
-import { ExpiringMultiParty } from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
+import {
+  CreatedExpiringMultiParty,
+  CreatedPerpetual
+} from "../../generated/templates/GenericContractCreator/GenericContractCreator";
+import { GenericFinancialContract } from "../../generated/templates/GenericFinancialContract/GenericFinancialContract";
 import { log, Bytes, Address } from "@graphprotocol/graph-ts";
 import {
   getOrCreateFinancialContract,
@@ -13,7 +16,10 @@ import {
   getOrCreateToken,
   calculateGCR
 } from "../utils/helpers";
-import { BIGINT_ONE, GOVERNOR_ADDRESS_STRING, BLACKLISTED_CREATORS } from "../utils/constants";
+import {
+  BIGINT_ONE,
+  GOVERNOR_ADDRESS_STRING
+} from "../utils/constants";
 import { toDecimal } from "../utils/decimals";
 
 // - event: NewContractRegistered(indexed address,indexed address,address[])
@@ -22,10 +28,7 @@ import { toDecimal } from "../utils/decimals";
 export function handleNewContractRegistered(
   event: NewContractRegistered
 ): void {
-  if (
-    event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING &&
-    !BLACKLISTED_CREATORS.includes(event.params.creator.toHexString())
-  ) {    
+  if (event.params.contractAddress.toHexString() != GOVERNOR_ADDRESS_STRING) {
     let contract = getOrCreateFinancialContract(
       event.params.contractAddress.toHexString()
     );
@@ -87,7 +90,7 @@ export function handleCreatedExpiringMultiParty(
       event.params.expiringMultiPartyAddress.toHexString()
     );
     let deployer = getOrCreateUser(event.params.deployerAddress);
-    let empContract = ExpiringMultiParty.bind(
+    let empContract = GenericFinancialContract.bind(
       event.params.expiringMultiPartyAddress
     );
 
@@ -116,6 +119,74 @@ export function handleCreatedExpiringMultiParty(
 
     contract.deployer = deployer.id;
     contract.address = event.params.expiringMultiPartyAddress;
+    contract.collateralRequirement = requirement.reverted
+      ? null
+      : toDecimal(requirement.value);
+    contract.expirationTimestamp = expiration.reverted
+      ? null
+      : expiration.value;
+    contract.totalTokensOutstanding = totalOutstanding.reverted
+      ? null
+      : toDecimal(totalOutstanding.value);
+    contract.cumulativeFeeMultiplier = feeMultiplier.reverted
+      ? null
+      : toDecimal(feeMultiplier.value);
+    contract.rawTotalPositionCollateral = rawCollateral.reverted
+      ? null
+      : toDecimal(rawCollateral.value);
+
+    contract.globalCollateralizationRatio = calculateGCR(
+      contract.rawTotalPositionCollateral,
+      contract.cumulativeFeeMultiplier,
+      contract.totalTokensOutstanding
+    );
+
+    contract.save();
+    deployer.save();
+  }
+}
+
+// - event: CreatedPerpetual(indexed address,indexed address)
+//   handler: handleCreatedPerpetual
+
+export function handleCreatedPerpetual(event: CreatedPerpetual): void {
+  if (
+    event.params.perpetualAddress.toHexString() !=
+    GOVERNOR_ADDRESS_STRING
+  ) {
+    let contract = getOrCreateFinancialContract(
+      event.params.perpetualAddress.toHexString()
+    );
+    let deployer = getOrCreateUser(event.params.deployerAddress);
+    let empContract = GenericFinancialContract.bind(
+      event.params.perpetualAddress
+    );
+
+    let collateral = empContract.try_collateralCurrency();
+    let synthetic = empContract.try_tokenCurrency();
+    let requirement = empContract.try_collateralRequirement();
+    let expiration = empContract.try_expirationTimestamp();
+    let totalOutstanding = empContract.try_totalTokensOutstanding();
+    let feeMultiplier = empContract.try_cumulativeFeeMultiplier();
+    let rawCollateral = empContract.try_rawTotalPositionCollateral();
+
+    if (!collateral.reverted) {
+      let collateralToken = getOrCreateToken(
+        collateral.value,
+        true,
+        true,
+        false
+      );
+      contract.collateralToken = collateralToken.id;
+    }
+
+    if (!synthetic.reverted) {
+      let syntheticToken = getOrCreateToken(synthetic.value, true, false, true);
+      contract.syntheticToken = syntheticToken.id;
+    }
+
+    contract.deployer = deployer.id;
+    contract.address = event.params.perpetualAddress;
     contract.collateralRequirement = requirement.reverted
       ? null
       : toDecimal(requirement.value);

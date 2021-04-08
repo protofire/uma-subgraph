@@ -7,10 +7,10 @@ import { Address } from "@graphprotocol/graph-ts";
 import {
   CollateralERC20,
   FeeERC20,
-  ExpiringMultiParty,
-  ExpiringMultiPartyCreator
+  GenericFinancialContract,
+  GenericContractCreator
 } from "../../../generated/templates";
-import { ERC20 } from "../../../generated/templates/ExpiringMultiPartyCreator/ERC20";
+import { ERC20 } from "../../../generated/templates/GenericContractCreator/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 import { DEFAULT_DECIMALS } from "../decimals";
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE } from "../constants";
@@ -29,7 +29,7 @@ export function getOrCreateFinancialContract(
     contract.totalCollateralWithdrawn = BIGDECIMAL_ZERO;
     contract.cumulativeFeeMultiplier = BIGDECIMAL_ONE; // Hardcoded in the contract
 
-    ExpiringMultiParty.create(Address.fromString(id));
+    GenericFinancialContract.create(Address.fromString(id));
   }
 
   return contract as FinancialContract;
@@ -45,7 +45,7 @@ export function getOrCreateContractCreator(
     contractCreator = new ContractCreator(id);
     contractCreator.isRemoved = false;
 
-    ExpiringMultiPartyCreator.create(Address.fromString(id));
+    GenericContractCreator.create(Address.fromString(id));
   }
 
   return contractCreator as ContractCreator;

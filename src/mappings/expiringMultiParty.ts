@@ -8,7 +8,7 @@ import {
   SettleExpiredPosition,
   NewSponsor,
   EndedSponsorPosition,
-  ExpiringMultiParty,
+  GenericFinancialContract,
   LiquidationCreated,
   LiquidationCreated1,
   LiquidationDisputed,
@@ -20,7 +20,7 @@ import {
   RequestTransferPositionExecuted,
   RequestTransferPositionCanceled,
   RequestTransferPosition
-} from "../../generated/templates/ExpiringMultiParty/ExpiringMultiParty";
+} from "../../generated/templates/GenericFinancialContract/GenericFinancialContract";
 import { Transfer } from "../../generated/templates/CollateralERC20/ERC20";
 import { Store } from "../../generated/Store/Store";
 import {
@@ -64,7 +64,7 @@ function updateSponsorPositionAndEMP(
     .concat("-")
     .concat(empAddress.toHexString());
   let sponsorPosition = getOrCreateSponsorPosition(positionId);
-  let empContract = ExpiringMultiParty.bind(empAddress);
+  let empContract = GenericFinancialContract.bind(empAddress);
   let position = empContract.try_positions(sponsorAddress);
   let collateral = empContract.try_getCollateral(sponsorAddress);
   let syntheticToken = getOrCreateToken(
@@ -98,7 +98,7 @@ function updateSponsorPositionAndEMP(
 
 function updateEMP(empAddress: Address): void {
   let emp = getOrCreateFinancialContract(empAddress.toHexString());
-  let empContract = ExpiringMultiParty.bind(empAddress);
+  let empContract = GenericFinancialContract.bind(empAddress);
   let feeMultiplier = empContract.try_cumulativeFeeMultiplier();
   let outstanding = empContract.try_totalTokensOutstanding();
   let rawCollateral = empContract.try_rawTotalPositionCollateral();
